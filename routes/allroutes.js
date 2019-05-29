@@ -1,4 +1,3 @@
-const route1 = require("./route1")
-const route2 = require("./route2")
+const beverages = require("./beverages");
 
-module.exports = { route1, route2 }
+module.exports = { beverages };
