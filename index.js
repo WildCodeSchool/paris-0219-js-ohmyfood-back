@@ -19,7 +19,9 @@ app.use(bodyParser.urlencoded({ extended: false }))
 // parse application/json
 app.use(bodyParser.json())
 
-app.use("/routes_pizzas", routes.routesPizza)
+app.use("/routes_pizzas", routes.routesPizza);
+app.use("/routes_user", routes.routesUser);
+app.use("/routes_user_address", routes.routesUserAddress);
 
 // page racine '/'
 app.get('/', (req, res) => {
