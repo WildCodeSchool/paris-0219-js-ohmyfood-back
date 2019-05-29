@@ -23,13 +23,38 @@ router.get("/users_address", (req, res) => {
 router.post("/users_address", (req, res) => {
   const usersCreateAddress = req.body;
 
-  connection.query('INSERT INTO users SET ?', usersCreateAddress, (err, results) => {
+  connection.query('INSERT INTO userAdress SET ?', usersCreateAddress, (err, results) => {
     if (err) {
       res.status(500).send('Erreur lors de la récupération des coordonnées de l\'utilisateur');
     } else {
       res.json(results);
     }
   });
+});
+
+router.put("/users_address", (req, res) => {
+  const usersUpdateAddress = req.body;
+
+  connection.query('UPDATE userAdress SET ?', usersUpdateAddress, (err, results) => {
+    if (err) {
+      res.status(500).send('Erreur lors de la mise à jour des coordonnées de l\'utilisateur');
+    } else {
+      res.json(results);
+    }
+  });
+});
+
+router.delete("/users_address", (req, res) => {
+  const usersDeleteAddress = req.body;
+
+  connection.query('DELETE FROM userAdress WHERE idUsers = ?', usersDeleteAddress, (err, results) => {
+    if (err) {
+      res.status(500).send('Erreur lors de la suppression des coordonnées de l\'utilisateur');
+    } else {
+      res.json(results);
+    }
+  });
+
 });
 
 module.exports = router;
