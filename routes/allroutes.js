@@ -1,4 +1,2 @@
-const route1 = require("./route1")
-const route2 = require("./route2")
-
-module.exports = { route1, route2 }
+const routesPizza = require("./routes_pizza")
+module.exports = { routesPizza }

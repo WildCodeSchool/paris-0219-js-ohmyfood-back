@@ -1,5 +1,5 @@
 // ********* script de connexion a la bdd ************
-//const connection = require('./conf'); //a decommenter une fois conf.js configure
+const connection = require('./conf'); //a decommenter une fois conf.js configure
 
 // ***** liste des modules installes + nodemon
 const express = require('express');
@@ -19,8 +19,7 @@ app.use(bodyParser.urlencoded({ extended: false }))
 // parse application/json
 app.use(bodyParser.json())
 
-app.use('/route1', routes.route1)
-app.use("/route2", routes.route2)
+app.use("/routes_pizzas", routes.routesPizza)
 
 // page racine '/'
 app.get('/', (req, res) => {
