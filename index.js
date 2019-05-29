@@ -19,13 +19,15 @@ app.use(bodyParser.urlencoded({ extended: false }))
 // parse application/json
 app.use(bodyParser.json())
 
-app.use('/route1', routes.route1)
-app.use("/route2", routes.route2)
-
 // page racine '/'
 app.get('/', (req, res) => {
   res.status(200).send('je suis a la racine /');
 })
+app.use('/saladsBase', routes.saladsBase);
+app.use('/saladsSauces', routes.saladsSauces);
+app.use('/saladsToppings', routes.saladsToppings);
+app.use('/saladsIngredients', routes.saladsIngredients);
+
 
 
 app.listen(port, (err) => {

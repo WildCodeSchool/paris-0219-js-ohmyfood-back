@@ -1,4 +1,6 @@
-const route1 = require("./route1")
-const route2 = require("./route2")
+const saladsBase = require("./saladsBase")
+const saladsSauces = require("./saladsSauces")
+const saladsToppings = require("./saladsToppings")
+const saladsIngredients = require("./saladsIngredients")
 
-module.exports = { route1, route2 }
+module.exports = { saladsBase, saladsSauces, saladsToppings, saladsIngredients }
