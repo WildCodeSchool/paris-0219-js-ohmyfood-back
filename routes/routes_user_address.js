@@ -44,10 +44,10 @@ router.put("/users_address", (req, res) => {
   });
 });
 
-router.delete("/users_address", (req, res) => {
-  const usersDeleteAddress = req.body;
+router.delete("/users_address/:id", (req, res) => {
+  const usersDeleteAddress = req.params.id;
 
-  connection.query('DELETE FROM userAdress WHERE idUsers = ?', usersDeleteAddress, (err, results) => {
+  connection.query('DELETE FROM userAdress WHERE idUserAddress = ?', usersDeleteAddress, (err, results) => {
     if (err) {
       res.status(500).send('Erreur lors de la suppression des coordonnées de l\'utilisateur');
     } else {
