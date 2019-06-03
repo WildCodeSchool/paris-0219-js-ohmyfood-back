@@ -23,11 +23,6 @@ app.use(bodyParser.json());
 
 app.use('/desserts', routes.desserts);
 
-// page racine '/'
-app.get('/', (req, res) => {
-  res.status(200).send('je suis a la racine /');
-})
-
 app.listen(port, (err) => {
   if (err) {
     throw new Error('Something bad happened...');

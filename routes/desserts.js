@@ -11,11 +11,6 @@ router.use(bodyParser.urlencoded({
 
 router.use(bodyParser.json());
 
-router.get("/", (req, res) => {
-  res.status(200).send("je suis dans /Desserts");
-  
-});
-
 router.get("/data_desserts", (req, res) => {
 
   connection.query('SELECT * FROM desserts', (err, results) => {
