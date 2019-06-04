@@ -5,10 +5,48 @@ const connection = require('../conf');
 // ecoute api //
 router.post('/', (req, res) => {
 
-  const formData = req.body
+  const formData = req.query
 
   // connection à la base de doonnée //
   connection.query('INSERT INTO saladsBase SET ?', formData, (err, res)  => {
+
+    if (err) {
+
+      // Si une erreur est survenue, alors on informe l'utilisateurde l'erreur //
+      res.status(500).send('Erreur lors de la récupération des données');
+
+    } else {
+      // Si tout s'est bien passé, on envoie le résultat de la requête SQL en tant que JSON. //
+      res.sendStatus(200);
+    }
+  });
+});
+// ecoute api //
+router.put('/', (req, res) => {
+
+  const formData = req.query
+
+  // connection à la base de doonnée //
+  connection.query('UPDATE INTO saladsBase SET ?', formData, (err, res)  => {
+
+    if (err) {
+
+      // Si une erreur est survenue, alors on informe l'utilisateurde l'erreur //
+      res.status(500).send('Erreur lors de la récupération des données');
+
+    } else {
+      // Si tout s'est bien passé, on envoie le résultat de la requête SQL en tant que JSON. //
+      res.sendStatus(200);
+    }
+  });
+});
+// ecoute api //
+router.delete('/', (req, res) => {
+
+  const formData = req.query
+
+  // connection à la base de doonnée //
+  connection.query('DELETE INTO saladsBase SET ?', formData, (err, res)  => {
 
     if (err) {
 
