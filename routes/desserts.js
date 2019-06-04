@@ -11,7 +11,7 @@ router.use(bodyParser.urlencoded({
 
 router.use(bodyParser.json());
 
-router.get("/data_desserts", (req, res) => {
+router.get("/", (req, res) => {
 
   connection.query('SELECT * FROM desserts', (err, results) => {
 
@@ -27,7 +27,7 @@ router.get("/data_desserts", (req, res) => {
   });
 });
 
-router.post("/data_desserts", (req, res) => {
+router.post("/", (req, res) => {
 
   //data's recovery
   const formData = req.body;
@@ -44,7 +44,41 @@ router.post("/data_desserts", (req, res) => {
       
       // If all good, send ok status
       res.sendStatus(200);
-    }
+    };
+  });
+});
+
+router.put('/', (req, res) => {
+
+  // get data
+  const id = req.body.idDesserts; // Get idDesserts
+  const formData = req.body; // Get all data
+
+  connection.query('UPDATE desserts SET ? WHERE idDesserts = ?', [formData, id], err => {
+
+    if (err) {
+      
+      res.status(500).send("Erreur lors de la modification d'un dessert");
+    } else {
+
+      res.sendStatus(200);
+    };
+  });
+});
+
+router.delete('/', (req, res) => {
+
+  const id = req.body.idDesserts;
+
+  connection.query('DELETE FROM desserts WHERE idDesserts = ?', [id], err => {
+
+    if (err) {
+
+      res.status(500).send("Erreur lors de la suppression d'un dessert");
+    } else {
+
+      res.sendStatus(200);
+    };
   });
 });
 
