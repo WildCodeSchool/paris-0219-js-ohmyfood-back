@@ -19,7 +19,7 @@ router.get("/", (req, res) => {
 });
 // ecoute api //
 router.post('/', (req, res) => {
-
+    
     const formData = req.query
   // connection à la base de doonnée //
   connection.query('INSERT INTO saladsIngredients SET ?', formData, (err, res)  => {
@@ -37,10 +37,10 @@ router.post('/', (req, res) => {
 });
 // ecoute api //
 router.put('/', (req, res) => {
-
+  const id = req.body.idIngredients
   const formData = req.query
 // connection à la base de doonnée //
-connection.query('UPDATE  saladsIngredients SET ?', formData, (err, res)  => {
+connection.query('UPDATE  saladsIngredients SET ?', [formData, idIngredients], (err, res)  => {
 
   if (err) {
 
