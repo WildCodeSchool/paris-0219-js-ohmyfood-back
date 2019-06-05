@@ -21,10 +21,10 @@ router.get("/", (req, res) => {
 // ecoute api //
 router.post('/', (req, res) => {
 
-    const formData = req.query
+    const formData = req.body
 
   // connection à la base de doonnée //
-  connection.query('INSERT INTO saladsToppings SET ?', formData, (err, res)  => {
+  connection.query('INSERT INTO saladsToppings SET ?', formData, (err, results)  => {
 
     if (err) {
 
@@ -39,10 +39,11 @@ router.post('/', (req, res) => {
 });
 router.put('/', (req, res) => {
 
-  const formData = req.query
+  const id = req.body.idSaladsToppings
+  const formData = req.body
 
 // connection à la base de doonnée //
-connection.query('UPDATE saladsToppings SET ?', formData, (err, res)  => {
+connection.query('UPDATE saladsToppings SET ? WHERE idSaladsToppings = ?', [formData, id], err  => {
 
   if (err) {
 
@@ -57,10 +58,10 @@ connection.query('UPDATE saladsToppings SET ?', formData, (err, res)  => {
 });
 router.delete('/', (req, res) => {
 
-  const formData = req.query
+  const id = req.body.idSaladsToppings
 
 // connection à la base de doonnée //
-connection.query('DELETE FROM saladsToppings SET ?', formData, (err, res)  => {
+connection.query('DELETE FROM saladsToppings WHERE idSaladsToppings = ?', [id], (err, results)  => {
 
   if (err) {
 

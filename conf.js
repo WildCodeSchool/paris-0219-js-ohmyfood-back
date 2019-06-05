@@ -6,7 +6,7 @@ password :  'Toto69', // le mot de passe
 database :  'ohmyfood' // le nom de la base de données
 });
 
-connection.connect(function(err) {
+connection.connect((err) => {
   if (err) throw err;
   console.log("Connected!");
 });

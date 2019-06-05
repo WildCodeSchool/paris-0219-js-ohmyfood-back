@@ -20,10 +20,10 @@ router.get("/", (req, res) => {
 // ecoute api //
 router.post('/', (req, res) => {
 
-  const formData = req.query
+  const formData = req.body
 
   // connection à la base de doonnée //
-  connection.query('INSERT INTO saladsBase SET ?', formData, (err, res)  => {
+  connection.query('INSERT INTO saladsBase SET ?', formData, (err, results)  => {
 
     if (err) {
 
@@ -39,10 +39,11 @@ router.post('/', (req, res) => {
 // ecoute api //
 router.put('/', (req, res) => {
 
-  const formData = req.query
+  const id = req.body.idSaladsBase
+  const formData = req.body
 
   // connection à la base de doonnée //
-  connection.query('UPDATE  saladsBase SET ?', formData, (err, res)  => {
+  connection.query('UPDATE  saladsBase SET ? WHERE idSaladsBase = ?', [formData, id], err  => {
 
     if (err) {
 
@@ -58,10 +59,10 @@ router.put('/', (req, res) => {
 // ecoute api //
 router.delete('/', (req, res) => {
 
-  const formData = req.query
+  const id = req.body.idSaladsBase
 
   // connection à la base de doonnée //
-  connection.query('DELETE FROM saladsBase SET ?', formData, (err, res)  => {
+  connection.query('DELETE FROM saladsBase WHERE idSaladsBase =  ?', [id], err  => {
 
     if (err) {
 

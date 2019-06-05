@@ -2,6 +2,15 @@ const express = require("express");
 const router = express.Router();
 const connection = require('../conf');
 
+// Body parser module
+
+const bodyParser = require('body-parser');
+router.use(bodyParser.urlencoded({
+  extended: true
+}));
+
+router.use(bodyParser.json());
+
 router.get("/", (req, res) => {
 
   connection.query('SELECT * FROM saladsIngredients', (err, results) => {
@@ -20,9 +29,9 @@ router.get("/", (req, res) => {
 // ecoute api //
 router.post('/', (req, res) => {
     
-    const formData = req.query
+  const formData = req.body
   // connection à la base de doonnée //
-  connection.query('INSERT INTO saladsIngredients SET ?', formData, (err, res)  => {
+  connection.query('INSERT INTO saladsIngredients SET ?', formData, (err, results)  => {
 
     if (err) {
 
@@ -37,28 +46,29 @@ router.post('/', (req, res) => {
 });
 // ecoute api //
 router.put('/', (req, res) => {
-  const id = req.body.idIngredients
-  const formData = req.query
-// connection à la base de doonnée //
-connection.query('UPDATE  saladsIngredients SET ?', [formData, idIngredients], (err, res)  => {
 
-  if (err) {
+  const id = req.body.idSaladsIngredients
+  const formData = req.body
+  // connection à la base de doonnée //
+  connection.query('UPDATE  saladsIngredients SET ? WHERE idSaladsIngredients = ?', [formData, id], (err, results)  => {
 
-    // Si une erreur est survenue, alors on informe l'utilisateurde l'erreur //
-    res.status(500).send('Erreur lors de la récupération des données');
+    if (err) {
 
-  } else {
-    // Si tout s'est bien passé, on envoie le résultat de la requête SQL en tant que JSON. //
-    res.sendStatus(200);
-  }
-});
+      // Si une erreur est survenue, alors on informe l'utilisateurde l'erreur //
+      res.status(500).send('Erreur lors de la récupération des données');
+
+    } else {
+      // Si tout s'est bien passé, on envoie le résultat de la requête SQL en tant que JSON. //
+      res.sendStatus(200);
+    }
+  });
 });
 // ecoute api //
 router.delete('/', (req, res) => {
 
-  const formData = req.query
+  const id = req.body.idSaladsIngredients
 // connection à la base de doonnée //
-connection.query('DELETE FROM saladsIngredients SET ?', formData, (err, res)  => {
+connection.query('DELETE FROM saladsIngredients  WHERE idSaladsIngredients = ?', [id], (err, results)  => {
 
   if (err) {
 
