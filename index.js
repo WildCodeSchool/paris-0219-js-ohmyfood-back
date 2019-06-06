@@ -14,9 +14,10 @@ const routes = require("./routes/allroutes");// ***** my routes *****
 app.use(morgan("dev"));
 app.use(morgan(":method :url :status :res[content-length] - :response-time "));
 
-app.use(bodyParser.urlencoded({ extended: true })); // parse application/x-www-form-urlencoded + // parse application/json
-
 app.use(cors());
+
+app.use(bodyParser.urlencoded({ extended: true })); // parse application/x-www-form-urlencoded + // parse application/json
+app.use(bodyParser.json());
 
 app.use("/pizzas", routes.pizzas);
 app.use('/desserts', routes.desserts);

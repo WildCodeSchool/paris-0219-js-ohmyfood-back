@@ -2,14 +2,6 @@ const express = require("express");
 const router = express.Router();
 const connection = require("../conf");
 
-// Body parser module
-const bodyParser = require('body-parser');
-router.use(bodyParser.urlencoded({
-  extended: true })
-);
-
-router.use(bodyParser.json());
-
 router.get("/", (req, res) => {
   connection.query('SELECT * FROM desserts', (err, results) => {
     if (err) {
@@ -21,9 +13,9 @@ router.get("/", (req, res) => {
 });
 
 router.post("/", (req, res) => {
-  const formData = req.body;
+  const dessertsCreate = req.body;
 
-  connection.query('INSERT INTO desserts SET ?', formData, (err, results) => {
+  connection.query('INSERT INTO desserts SET ?', dessertsCreate, (err, results) => {
     if (err) {
       res.status(500).send("Erreur lors de la commande de votre desserts ");
     } else {
@@ -34,9 +26,9 @@ router.post("/", (req, res) => {
 
 router.put('/', (req, res) => {
   const id = req.body.idDesserts; // Get idDesserts
-  const formData = req.body; // Get all data
+  const dessertsUpdate = req.body; // Get all data
 
-  connection.query('UPDATE desserts SET ? WHERE idDesserts = ?', [formData, id], err => {
+  connection.query('UPDATE desserts SET ? WHERE idDesserts = ?', [dessertsUpdate, id], err => {
     if (err) {
       res.status(500).send("Erreur lors de la modification d'un dessert");
     } else {
