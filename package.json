@@ -1,0 +1,21 @@
+{
+  "name": "nodejs-express",
+  "version": "1.0.0",
+  "description": "use of routes with express",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "nodemon index.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@mysql/xdevapi": "^8.0.16",
+    "body-parser": "^1.19.0",
+    "cors": "^2.8.5",
+    "express": "^4.16.4",
+    "morgan": "^1.9.1",
+    "mysql": "^2.17.1",
+    "nodemon": "^1.19.0"
+  }
+}
