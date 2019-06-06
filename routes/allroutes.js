@@ -1,3 +1,4 @@
-const routesPizza = require("./routes_pizza");
+const pizzas = require("./pizzas");
+const desserts = require("./desserts");
 
-module.exports = { routesPizza };
+module.exports = { pizzas, desserts };
