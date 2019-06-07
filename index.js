@@ -37,7 +37,9 @@ app.use('/saladsSauces', routes.saladsSauces);
 app.use('/saladsToppings', routes.saladsToppings);
 app.use('/saladsIngredients', routes.saladsIngredients);
 app.use('/pizzas', routes.pizzas);
+app.use('/beverages', routes.beverages);
 app.use('/desserts', routes.desserts);
+app.use("/pizzas", routes.pizzas);
 
 
 
