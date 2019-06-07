@@ -3,74 +3,70 @@ const router = express.Router();
 const connection = require('../conf');
 
 router.get("/", (req, res) => {
-
   connection.query('SELECT * FROM saladsSauces', (err, results) => {
-
     if (err) {
-      
-      // If error, warn user
-      res.status(500).send('Erreur lors de la récupération du dessert');
+      console.log(err)
+      res.status(500).send('Erreur lors de la récupération');
     } else {
-
-      // If all good, send resul as JSON
       res.json(results);
     };
   });
 });
 // ecoute api //
 
-router.post('/', (req, res) => {
+// router.post('/', (req, res) => {
 
-  const formData = req.body
-  // connection à la base de doonnée //
-  connection.query('INSERT INTO saladsSauces SET ?', formData, (err, results)  => {
+//   const formData = req.body
+//   // connection à la base de doonnée //
+//   connection.query('INSERT INTO saladsSauces SET ?', formData, (err, results)  => {
 
-    if (err) {
+//     if (err) {
 
-      // Si une erreur est survenue, alors on informe l'utilisateurde l'erreur //
-      res.status(500).send('Erreur lors de la récupération des données');
+//       // Si une erreur est survenue, alors on informe l'utilisateurde l'erreur //
+//       res.status(500).send('Erreur lors de la récupération des données');
 
-    } else {
-      // Si tout s'est bien passé, on envoie le résultat de la requête SQL en tant que JSON. //
-      res.sendStatus(200);
-    }
-  });
-});
-router.put('/', (req, res) => {
+//     } else {
+//       // Si tout s'est bien passé, on envoie le résultat de la requête SQL en tant que JSON. //
+//       res.sendStatus(200);
+//     }
+//   });
+// });
 
-  const id = req.body.idSaladsSauces
-  const formData = req.body
+// router.put('/', (req, res) => {
 
-  // connection à la base de doonnée //
-  connection.query('UPDATE saladsSauces SET ? WHERE idSaladsSauces = ? ', [formData, id], (err, results)  => {
+//   const id = req.body.idSaladsSauces
+//   const formData = req.body
 
-    if (err) {
+//   // connection à la base de doonnée //
+//   connection.query('UPDATE saladsSauces SET ? WHERE idSaladsSauces = ? ', [formData, id], (err, results)  => {
 
-      // Si une erreur est survenue, alors on informe l'utilisateurde l'erreur //
-      res.status(500).send('Erreur lors de la récupération des données');
+//     if (err) {
 
-    } else {
-      // Si tout s'est bien passé, on envoie le résultat de la requête SQL en tant que JSON. //
-      res.sendStatus(200);
-    }
-  });
-});
-router.delete('/', (req, res) => {
+//       // Si une erreur est survenue, alors on informe l'utilisateurde l'erreur //
+//       res.status(500).send('Erreur lors de la récupération des données');
 
-  const id = req.body.idSaladsSauces
+//     } else {
+//       // Si tout s'est bien passé, on envoie le résultat de la requête SQL en tant que JSON. //
+//       res.sendStatus(200);
+//     }
+//   });
+// });
+// router.delete('/', (req, res) => {
 
-  // connection à la base de doonnée //
-  connection.query('DELETE FROM saladsSauces WHERE idSaladsSauces = ?', [id], (err, results)  => {
+//   const id = req.body.idSaladsSauces
 
-    if (err) {
+//   // connection à la base de doonnée //
+//   connection.query('DELETE FROM saladsSauces WHERE idSaladsSauces = ?', [id], (err, results)  => {
 
-      // Si une erreur est survenue, alors on informe l'utilisateurde l'erreur //
-      res.status(500).send('Erreur lors de la récupération des données');
+//     if (err) {
 
-    } else {
-      // Si tout s'est bien passé, on envoie le résultat de la requête SQL en tant que JSON. //
-      res.sendStatus(200);
-    }
-  });
-});
+//       // Si une erreur est survenue, alors on informe l'utilisateurde l'erreur //
+//       res.status(500).send('Erreur lors de la récupération des données');
+
+//     } else {
+//       // Si tout s'est bien passé, on envoie le résultat de la requête SQL en tant que JSON. //
+//       res.sendStatus(200);
+//     }
+//   });
+// });
 module.exports = router

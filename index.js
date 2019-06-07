@@ -26,9 +26,6 @@ app.use(morgan(":method :url :status :res[content-length] - :response-time "));
 
 
 // page racine '/'
-app.get('/', (req, res) => {
-  res.status(200).send('je suis a la racine /');
-})
 
 app.use(cors());
 
@@ -39,8 +36,10 @@ app.use('/saladsIngredients', routes.saladsIngredients);
 app.use('/pizzas', routes.pizzas);
 app.use('/beverages', routes.beverages);
 app.use('/desserts', routes.desserts);
-app.use("/pizzas", routes.pizzas);
 
+app.get('/', (req, res) => {
+  res.status(200).send('je suis a la racine /');
+})
 
 
 app.listen(port, (err) => {
