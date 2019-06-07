@@ -17,7 +17,20 @@ router.post("/", (req, res) => {
   
   connection.query('INSERT INTO pizzas SET ?', pizzasCreate, (err, results) => {
     if (err) {
-      res.status(500).send('Erreur lors de la récupération des pizzas');
+      res.status(500).send('Erreur lors de la création de la pizza');
+    } else {
+      res.sendStatus(200);
+    };
+  });
+});
+
+router.put('/', (req, res) => {
+  const id = req.body.idPizzas; // Get idDesserts
+  const pizzasUpdate = req.body; // Get all data
+
+  connection.query('UPDATE pizzas SET ? WHERE idPizzas = ?', [pizzasUpdate, id], err => {
+    if (err) {
+      res.status(500).send("Erreur lors de la mise à jour de la pizza");
     } else {
       res.sendStatus(200);
     };
@@ -25,11 +38,11 @@ router.post("/", (req, res) => {
 });
 
 router.delete("/", (req, res) => {
-  const pizzasOrdersDelete = req.body.id;
+  const pizzasDelete = req.body.id;
 
-  connection.query('DELETE FROM pizzas WHERE idPizzas = ?', pizzasOrdersDelete, (err, results) => {
+  connection.query('DELETE FROM pizzas WHERE idPizzas = ?', pizzasDelete, (err, results) => {
     if (err) {
-      res.status(500).send('Erreur lors de la récupération des pizzas');
+      res.status(500).send('Erreur lors de la suppression de la pizza');
     } else {
       res.sendStatus(200);
     };
