@@ -21,6 +21,7 @@ app.use(bodyParser.json());
 
 app.use("/pizzas", routes.pizzas);
 app.use('/desserts', routes.desserts);
+app.use('/confirmOrder', routes.confirmOrder);
 
 app.listen(port, (err) => {
   if (err) {
