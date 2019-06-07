@@ -19,8 +19,9 @@ app.use(cors());
 app.use(bodyParser.urlencoded({ extended: true })); // parse application/x-www-form-urlencoded + // parse application/json
 app.use(bodyParser.json());
 
-app.use("/pizzas", routes.pizzas);
+app.use('/beverages', routes.beverages);
 app.use('/desserts', routes.desserts);
+app.use("/pizzas", routes.pizzas);
 
 app.listen(port, (err) => {
   if (err) {

@@ -1,4 +1,5 @@
-const pizzas = require("./pizzas");
+const beverages = require("./beverages");
 const desserts = require("./desserts");
+const pizzas = require("./pizzas");
 
-module.exports = { pizzas, desserts };
+module.exports = { beverages, desserts, pizzas };
