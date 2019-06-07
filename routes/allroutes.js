@@ -3,6 +3,7 @@ const saladsSauces = require("./saladsSauces")
 const saladsToppings = require("./saladsToppings")
 const saladsIngredients = require("./saladsIngredients")
 const desserts = require("./desserts");
+const pizzas = require("./pizzas")
 
-module.exports = { saladsBase, saladsSauces, saladsToppings, saladsIngredients, desserts }
+module.exports = { saladsBase, saladsSauces, saladsToppings, saladsIngredients, desserts, pizzas }
 
