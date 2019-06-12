@@ -24,6 +24,7 @@ app.use('/saladsIngredients', routes.saladsIngredients);
 app.use('/pizzas', routes.pizzas);
 app.use('/beverages', routes.beverages);
 app.use('/desserts', routes.desserts);
+app.use('/confirmOrder', routes.confirmOrder);
 
 app.listen(port, (err) => {
   if (err) {
