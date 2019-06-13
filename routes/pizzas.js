@@ -14,9 +14,7 @@ router.get("/", (req, res) => {
 });
 
 router.post("/", (req, res) => {
-  console.log(req.body)
   const pizzasCreate = req.body;
-  console.log(pizzasCreate)
   
   connection.query('INSERT INTO pizzas SET ?', pizzasCreate, (err, results) => {
     if (err) {
