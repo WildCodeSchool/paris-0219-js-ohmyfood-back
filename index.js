@@ -10,7 +10,8 @@ const express = require('express'),
 const routes = require("./routes");
 
 // *** app.use
-app.use(bodyParser.urlencoded({ extended: true })); // parse application/x-www-form-urlencoded + // parse application/json
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: false })); // parse application/x-www-form-urlencoded + // parse application/json
 
 app.use(morgan("dev"));
 app.use(morgan(":method :url :status :res[content-length] - :response-time "));
