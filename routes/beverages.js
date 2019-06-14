@@ -13,7 +13,8 @@ router.use(bodyParser.json());
 
 router.get('/', (req, res) => {
 	
-	connection.query('SELECT * FROM beverages', (err, results) => {
+	connection.query('SELECT idBeverages, bevName, CAST(FLOOR(bevPrice_ht * taxValue * 100) / 100 AS DECIMAL(16,2)) AS bevPriceTTC ' + 
+	'FROM beverages JOIN tax ON beverages.idTax = tax.idTax', (err, results) => {
 
 		if (err){
 			// answer given to the user in case of an error
@@ -29,10 +30,10 @@ router.get('/', (req, res) => {
 router.post('/', (req, res) => {
 
 	// data's recovery
-	const formData = req.body;
+	const beveragesCreate = req.body;
 
 	// connection into the database and insert beverages
-	connection.query('INSERT INTO beverages SET ?', formData, (err, results) => {
+	connection.query('INSERT INTO beverages SET ?', beveragesCreate, (err, results) => {
 
 		if (err) {
 			console.log(err)
@@ -50,9 +51,9 @@ router.put('/', (req, res) => {
 
 	// get data
 	const id = req.body.idBeverages; // Get idBeverages
-	const formData = req.body; // Get all data
+	const beveragesUpdate = req.body; // Get all data
   
-	connection.query('UPDATE beverages SET ? WHERE idBeverages = ?', [formData, id], err => {
+	connection.query('UPDATE beverages SET ? WHERE idBeverages = ?', [beveragesUpdate, id], err => {
   
 	  if (err) {
 		
