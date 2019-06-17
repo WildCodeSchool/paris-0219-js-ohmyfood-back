@@ -2,11 +2,9 @@ const express = require("express");
 const router = express.Router();
 const connection = require ("../conf");
 
-router.get('/', (req, res) => {
-	
+router.get("/", (req, res) => {
 	connection.query('SELECT idBeverages, bevName, CAST(FLOOR(bevPriceHt * taxValue * 100) / 100 AS DECIMAL(16,2)) AS bevPriceTTC ' + 
-	'FROM beverages JOIN tax ON beverages.idTax = tax.idTax', (err, results) => {
-
+									'FROM beverages JOIN tax ON beverages.idTax = tax.idTax', (err, results) => {
 		if (err){
 			res.status(500).send('Erreur lors de la rcupération de la boisson');
 		} else {
@@ -15,12 +13,9 @@ router.get('/', (req, res) => {
 	});
 });
 
-router.post('/', (req, res) => {
-
-	// data's recovery
+router.post("/", (req, res) => {
 	const beveragesCreate = req.body;
 
-	// connection into the database and insert beverages
 	connection.query('INSERT INTO beverages SET ?', beveragesCreate, (err, results) => {
 		if (err) {
 			res.status(500).send('Erreur lors de la commande de votre boisson');
@@ -30,9 +25,7 @@ router.post('/', (req, res) => {
 	});
 });
 
-router.put('/', (req, res) => {
-
-	// get data
+router.put("/", (req, res) => {
 	const id = req.body.idBeverages; // Get idBeverages
 	const beveragesUpdate = req.body; // Get all data
   
@@ -45,8 +38,7 @@ router.put('/', (req, res) => {
 	});
 });
 
-router.delete('/', (req, res) => {
-
+router.delete("/", (req, res) => {
 	const id = req.body.idBeverages;
   
 	connection.query('DELETE FROM beverages WHERE idBeverages = ?', [id], err => {
