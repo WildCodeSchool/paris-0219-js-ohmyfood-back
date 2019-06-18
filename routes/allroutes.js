@@ -5,6 +5,7 @@ const saladsIngredients = require("./saladsIngredients")
 const desserts = require("./desserts");
 const pizzas = require("./pizzas")
 const beverages = require("./beverages")
+const salads = require("./salads")
 
-module.exports = { saladsBase, saladsSauces, saladsToppings, saladsIngredients, desserts, pizzas, beverages }
+module.exports = { saladsBase, saladsSauces, saladsToppings, saladsIngredients, desserts, pizzas, beverages, salads}
 
