@@ -26,10 +26,10 @@ router.post("/", (req, res) => {
 });
 
 router.put('/', (req, res) => {
-  const id = req.body.idPizzas; // Get idDesserts
-  const pizzasUpdate = req.body; // Get all data
+  const namePizza = req.body.pizzName;
+  const pizzasUpdate = req.body;
 
-  connection.query('UPDATE pizzas SET ? WHERE idPizzas = ?', [pizzasUpdate, id], err => {
+  connection.query('UPDATE pizzas SET ? WHERE pizzName = ?', [pizzasUpdate, namePizza], err => {
     if (err) {
       res.status(500).send("Erreur lors de la mise à jour de la pizza");
     } else {
@@ -39,9 +39,9 @@ router.put('/', (req, res) => {
 });
 
 router.delete("/", (req, res) => {
-  const pizzasDelete = req.body.id;
+  const pizzasDelete = req.body.pizzName;
 
-  connection.query('DELETE FROM pizzas WHERE idPizzas = ?', pizzasDelete, (err, results) => {
+  connection.query('DELETE FROM pizzas WHERE pizzName = ?', pizzasDelete, (err, results) => {
     if (err) {
       res.status(500).send('Erreur lors de la suppression de la pizza');
     } else {
