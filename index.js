@@ -10,20 +10,15 @@ const port = 3000;
 
 
 // ***** my routes *****
-const routes = require("./routes/allroutes");
-// parse application/x-www-form-urlencoded
-app.use(bodyParser.urlencoded({ extended: false }));
-
+const routes = require("./routes");
 
 
 app.use(bodyParser.urlencoded({ extended: true })); // parse application/x-www-form-urlencoded + // parse application/json
 app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: false })); // parse application/x-www-form-urlencoded + // parse application/json
 
 app.use(morgan("dev"));
 app.use(morgan(":method :url :status :res[content-length] - :response-time "));
-
-
-// page racine '/'
 
 app.use(cors());
 
@@ -43,6 +38,7 @@ app.get('/', (req, res) => {
   res.status(200).send('je suis a la racine /');
 })
 
+app.use('/confirmOrder', routes.confirmOrder);
 
 app.listen(port, (err) => {
   if (err) {
