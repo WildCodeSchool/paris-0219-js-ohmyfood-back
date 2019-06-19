@@ -40,7 +40,7 @@ router.put('/', (req, res) => {
 
 router.delete("/", (req, res) => {
   const pizzasDelete = req.body.pizzName;
-
+  console.log(pizzasDelete)
   connection.query('DELETE FROM pizzas WHERE pizzName = ?', pizzasDelete, (err, results) => {
     if (err) {
       res.status(500).send('Erreur lors de la suppression de la pizza');
