@@ -26,7 +26,15 @@ router.post("/", (req, res) => {
 });
 
 router.put('/', (req, res) => {
-  const namePizza = req.body.pizzName;
+  let namePizza = '';
+
+  if (req.body.pizzName.indexOf('|') != -1) {
+    console.log('there is one |')
+    namePizza = req.body.pizzName.split('|')[0];
+    req.body.pizzName = req.body.pizzName.split('|')[1];
+  }else{
+    namePizza = req.body.pizzName;
+  }
   const pizzasUpdate = req.body;
 
   connection.query('UPDATE pizzas SET ? WHERE pizzName = ?', [pizzasUpdate, namePizza], err => {
