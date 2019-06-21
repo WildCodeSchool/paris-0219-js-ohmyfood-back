@@ -39,11 +39,9 @@ router.put('/', (req, res) => {
 });
 
 router.delete("/", (req, res) => {
-  const firstNameUser = req.body.firstname;
-  const lastNameUser = req.body.lastname;
-  const userDelete = req.query.user;
+  const mailUser = req.body.mail;
 
-  connection.query('DELETE FROM users WHERE firstname = ? AND lastname = ?', [userDelete, firstNameUser, lastNameUser], (err, results) => {
+  connection.query('DELETE FROM users WHERE mail = ?', [mailUser], (err, results) => {
     if (err) {
       res.status(500).send('Erreur lors de la suppression de la pizza');
     } else {
