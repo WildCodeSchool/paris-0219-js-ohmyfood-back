@@ -7,6 +7,18 @@ const pizzas = require("./pizzas");
 const beverages = require("./beverages");
 const confirmOrder = require("./confirmOrder");
 const users = require("./users");
+const login = require("./login");
 
-module.exports = { saladsBase, saladsSauces, saladsToppings, saladsIngredients, desserts, pizzas, beverages, confirmOrder, users }
+module.exports = { 
+    saladsBase, 
+    saladsSauces, 
+    saladsToppings, 
+    saladsIngredients, 
+    desserts, 
+    pizzas, 
+    beverages, 
+    confirmOrder, 
+    users, 
+    login
+}
 
