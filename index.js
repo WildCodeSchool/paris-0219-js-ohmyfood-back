@@ -3,7 +3,8 @@ const express = require('express'),
     port = 3000,
     bodyParser = require("body-parser"),
     morgan = require("morgan"),
-    cors = require('cors');
+    cors = require('cors'),
+    useragent = require('express-useragent'); //what is the used browser
 
 
 // ***** my routes *****
@@ -17,6 +18,7 @@ app.use(morgan("dev"));
 app.use(morgan(":method :url :status :res[content-length] - :response-time "));
 
 app.use(cors());
+app.use(useragent.express()); // what is the used browser
 
 app.use('/saladsBase', routes.saladsBase);
 app.use('/saladsSauces', routes.saladsSauces);

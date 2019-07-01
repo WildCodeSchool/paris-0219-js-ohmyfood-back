@@ -21,13 +21,16 @@ router.post("/", (req, res) => {
         } else {
           console.log("user recognized");
           const token = jwt.sign(userData, jwtSecret, (err, token) => {
-            res.json({
-              token
-            })
+            if (req.useragent.browser === 'Chrome') {
+              res.json({
+                token
+              })
+            }else if (req.useragent.browser === 'Firefox') {
+              res.json(token)
+            }
           })
           res.header("Access-Control-Expose-Headers", "x-access-token");
           res.set("x-access-token", token);
-          console.log(res.header)
           res.status(200);
         }
       })
