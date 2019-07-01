@@ -3,7 +3,8 @@ const router = express.Router();
 const connection = require('../conf');
 
 router.get("/", (req, res) => {
-  connection.query('SELECT * FROM saladsIngredients', (err, results) => {
+  connection.query('SELECT idSaladsIngredients, saladsIngredientsName, CAST((saladsIngredientsPriceHt * taxValue * 100) / 100 AS DECIMAL(16,2)) AS saladsIngredientsPriceTTC ' + 
+  'FROM saladsIngredients JOIN tax ON saladsIngredients.idTax = tax.idTax', (err, results) => {
     if (err) {
       res.status(500).send('Erreur lors de la récupération des ingrédients');
     } else {
