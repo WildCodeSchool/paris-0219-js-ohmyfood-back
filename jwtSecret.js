@@ -1,0 +1,1 @@
+module.exports = "All hail pizzas, OhMyFood project"; // ne pas push ce fichier
