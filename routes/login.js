@@ -6,9 +6,8 @@ const jwtSecret = require("../jwtSecret");
 
 router.post("/", (req, res) => {
   const userData = req.body;
-  const userMail = req.body.mail;
   const userPssw = req.body.password;
-
+  const userMail = req.body.mail;
   connection.query(`SELECT * FROM users WHERE mail = '${userMail}' AND password = '${userPssw}'`, (err, results) => {
     if (results.length === 0) {
       res.status(401).send("Vous n'avez pas de compte");
