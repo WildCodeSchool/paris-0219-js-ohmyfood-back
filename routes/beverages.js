@@ -3,9 +3,6 @@ const router = express.Router();
 const connection = require ('../conf');
  
 
-router.get('/', (req, res) => {
-	
-	connection.query('SELECT * FROM beverages', (err, results) => {
 
 router.get("/", (req, res) => {
 	connection.query('SELECT idBeverages, bevName, CAST((bevPriceHt * taxValue * 100) / 100 AS DECIMAL(16,2)) AS bevPriceTTC ' + 
@@ -52,7 +49,5 @@ router.delete("/", (req, res) => {
 		 res.sendStatus(200);
 	   };
 	});
-});
-});
 });
 module.exports = router;
