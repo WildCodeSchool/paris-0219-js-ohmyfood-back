@@ -12,15 +12,18 @@ router.post("/", (req, res) => {
     if (results.length === 0) {
       res.status(401).send("Vous n'avez pas de compte");
     } else {
-      console.log("user recognized");
       const token = jwt.sign(userData, jwtSecret, (err, token) => {
           res.json({
-            token
+            token,
+            'userMail': results['0'].mail,
+            'userFirstName': results['0'].firstname,
+            'userLastName': results['0'].lastname,
+            'userRight': results['0'].userRight
           })
       })
-      console.log(results.body)
       res.header("Access-Control-Expose-Headers", "x-access-token");
       res.set("x-access-token", token);
+      console.log(results['0'])
       res.status(200);
     }
   })
@@ -29,7 +32,6 @@ router.post("/", (req, res) => {
 // vérifier le token pour les pages protégées 
 
 router.post("/protected", (req, res, next) => {
-  console.log('protectCall')
   const token = verifToken(req);
   const objectTests = { //data appelées par la bdd 
     test: 'ok',
