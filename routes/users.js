@@ -2,16 +2,6 @@ const express = require("express");
 const router = express.Router();
 const connection = require("../conf");
 
-router.get("/userInfos", (req, res) => {
-  connection.query(`SELECT lastname, firstname, mail, userRight FROM users`, (err, results) => {
-    if (err) {
-      res.status(500).send("Erreur lors de l'affichage des informations de l'utilisateur");
-    } else {
-      res.json(results);
-    };
-  });
-});
-
 router.get("/", (req, res) => {
   connection.query('SELECT * FROM users', (err, results) => {
     if (err) {
