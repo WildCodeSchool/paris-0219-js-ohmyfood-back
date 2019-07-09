@@ -25,10 +25,10 @@ router.post('/', (req, res) => {
 });
 
 router.put('/', (req, res) => {
-  const id = req.body.idSaladsBase;
+  const id = req.body.saladsBaseName;
   const updateSaladBase = req.body;
 
-  connection.query('UPDATE saladsBase SET ? WHERE idSaladsBase = ?', [updateSaladBase, id], err => {
+  connection.query('UPDATE saladsBase SET ? WHERE saladsBaseName = ?', [updateSaladBase, id], err => {
     if (err) {
       res.status(500).send('Erreur lors de la mise à jour de la base salade');
     } else {
@@ -38,9 +38,9 @@ router.put('/', (req, res) => {
 });
 
 router.delete('/', (req, res) => {
-  const id = req.body.idSaladsBase;
+  const id = req.body.saladsBaseName;
 
-  connection.query('DELETE FROM saladsBase WHERE idSaladsBase = ?', [id], err => {
+  connection.query('DELETE FROM saladsBase WHERE saladsBaseName = ?', [id], err => {
     if (err) {
       res.status(500).send('Erreur lors de la suppression de la base salade');
     } else {
