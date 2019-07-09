@@ -1,0 +1,7 @@
+# Dependency directories
+#repo
+node_modules/
+
+
+#mac hidden files
+.README.md.icloud
