@@ -26,10 +26,10 @@ router.post("/", (req, res) => {
 });
 
 router.put('/', (req, res) => {
-  const id = req.body.dessName;
-  const dessertsUpdate = req.body; 
+  const dessertName = req.body.dessName; // Get idDesserts
+  const dessertsUpdate = req.body; // Get all data
 
-  connection.query('UPDATE desserts SET ? WHERE dessName = ?', [dessertsUpdate, id], err => {
+  connection.query('UPDATE desserts SET ? WHERE dessName = ?', [dessertsUpdate, dessertName], err => {
     if (err) {
       res.status(500).send("Erreur lors de la modification d'un dessert");
     } else {
@@ -39,9 +39,9 @@ router.put('/', (req, res) => {
 });
 
 router.delete('/', (req, res) => {
-  const id = req.body.dessName;
+  const dessertName = req.query.dessName;
 
-  connection.query('DELETE FROM desserts WHERE dessName = ?', [id], err => {
+  connection.query('DELETE FROM desserts WHERE dessName = ?', [dessertName], err => {
     if (err) {
       res.status(500).send("Erreur lors de la suppression d'un dessert");
     } else {

@@ -3,7 +3,8 @@ const router = express.Router();
 const connection = require('../conf');
 
 router.get("/", (req, res) => {
-  connection.query('SELECT * FROM saladsIngredients', (err, results) => {
+  connection.query('SELECT idSaladsIngredients, saladsIngredientsName, CAST((saladsIngredientsPriceHt * taxValue * 100) / 100 AS DECIMAL(16,2)) AS saladsIngredientsPriceTTC ' + 
+  'FROM saladsIngredients JOIN tax ON saladsIngredients.idTax = tax.idTax', (err, results) => {
     if (err) {
       res.status(500).send('Erreur lors de la récupération des ingrédients');
     } else {
@@ -25,10 +26,10 @@ router.post('/', (req, res) => {
 });
 
 router.put('/', (req, res) => {
-  const id = req.body.saladsIngredientsName;
+  const name = req.body.saladsIngredientsName;
   const updateSaladIng = req.body;
 
-  connection.query('UPDATE saladsIngredients SET ? WHERE saladsIngredientsName = ?', [updateSaladIng, id], (err, results) => {
+  connection.query('UPDATE saladsIngredients SET ? WHERE saladsIngredientsName = ?', [updateSaladIng, name], (err, results) => {
     if (err) {
       res.status(500).send('Erreur lors de la mise à jour des ingrédients');
     } else {
@@ -38,9 +39,9 @@ router.put('/', (req, res) => {
 });
 
 router.delete('/', (req, res) => {
-  const id = req.body.isaladsIngredientsName
+  const name = req.body.isaladsIngredientsName
 
-  connection.query('DELETE FROM saladsIngredients WHERE saladsIngredientsName = ?', [id], (err, results) => {
+  connection.query('DELETE FROM saladsIngredients WHERE saladsIngredientsName = ?', [name], (err, results) => {
     if (err) {
       res.status(500).send("Erreur lors de la suppression de l'ingrédient");
     } else {
