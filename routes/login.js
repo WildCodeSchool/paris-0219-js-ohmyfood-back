@@ -6,11 +6,9 @@ const jwtSecret = require("../jwtSecret");
 
 router.post("/", (req, res) => {
   const userData = req.body;
-  const userMail = req.body.mail;
   const userPssw = req.body.password;
-
-  connection.query(`SELECT mail FROM users WHERE mail = '${userMail}'`, (err, results) => {
-
+  const userMail = req.body.mail;
+  connection.query(`SELECT * FROM users WHERE mail = '${userMail}' AND password = '${userPssw}'`, (err, results) => {
     if (results.length === 0) {
       res.status(401).send("Vous n'avez pas de compte");
     } else {
@@ -42,7 +40,6 @@ router.post("/", (req, res) => {
 // vérifier le token pour les pages protégées 
 
 router.post("/protected", (req, res, next) => {
-  console.log('protectCall')
   const token = verifToken(req);
   const objectTests = { //data appelées par la bdd 
     test: 'ok',
