@@ -2,16 +2,6 @@ const express = require("express");
 const router = express.Router();
 const connection = require("../conf");
 
-router.get("/userInfos", (req, res) => {
-  connection.query('SELECT lastname, firstname, mail FROM users', (err, results) => {
-    if (err) {
-      res.status(500).send("Erreur lors de l'affichage des informations de l'utilisateur");
-    } else {
-      res.json(results);
-    };
-  });
-});
-
 router.get("/", (req, res) => {
   connection.query('SELECT * FROM users', (err, results) => {
     if (err) {
@@ -24,8 +14,9 @@ router.get("/", (req, res) => {
 
 router.post("/", (req, res) => {
 
-  const userData = req.body;
-  const userMail = req.body.mail
+  const userData = req.body['0'];
+  const userMail = req.body['0'].mail
+  const userDataAddress = req.body['1'];
   console.log('userMail', userData.mail)
 
   connection.query(`SELECT mail FROM users WHERE mail = '${userMail}'`, (err, results) => {
@@ -43,13 +34,49 @@ router.post("/", (req, res) => {
           res.status(500).send("Erreur lors de la création de l'utilisateur");
         }
         else {
-          console.log(results)
-          res.sendStatus(200)
+          connection.query(`SELECT idUsers FROM users WHERE mail = '${userMail}'`, (err, results) => {
+            userDataAddress.idUsers = results['0'].idUsers;
+            connection.query('INSERT INTO userAdress SET ?', [userDataAddress], (err, results) => {
+              if (err) {
+                console.log(err);
+                res.status(500).send("Erreur lors de la création de l'utilisateur");
+              }
+              else {
+                res.sendStatus(200)
+              } 
+            });
+          });
         } 
       });
     } 
   });
 });
+
+router.post("/account", (req, res, next) => {
+  const userMail = req.body['0'];
+  let userId = '';
+  let mergeUserAndAdress = '';
+  connection.query(`SELECT * FROM users WHERE mail = '${userMail}'`, (err, results) => {
+    if(err) {
+      console.log(err);
+      return res.status(401).send({mess: "Vous n'avez pas accès aux données"});
+    }
+    userId = results['0'].idUsers
+    console.log('result', results)
+    connection.query(`SELECT * FROM userAdress WHERE idUsers = '${userId}'`, (err, resultsAdress) => {
+      if(err) {
+        console.log(err);
+        return res.status(401).send({mess: "Vous n'avez pas accès aux données"});
+      }
+      mergeUserAndAdress = {
+        '0': results['0'], 
+        '1': resultsAdress['0']
+      }
+      res.json(mergeUserAndAdress);
+      res.status(200)
+    })
+  })
+})
 
 
 router.put('/', (req, res) => {
