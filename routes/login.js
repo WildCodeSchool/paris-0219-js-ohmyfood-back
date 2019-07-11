@@ -18,7 +18,7 @@ router.post("/", (req, res) => {
             'userMail': results['0'].mail,
             'userFirstName': results['0'].firstname,
             'userLastName': results['0'].lastname,
-            'userRight': results['0'].userRight
+            'userRight': results['0'].userRight,
           })
       })
       res.header("Access-Control-Expose-Headers", "x-access-token");

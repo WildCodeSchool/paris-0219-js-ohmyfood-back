@@ -14,8 +14,9 @@ router.get("/", (req, res) => {
 
 router.post("/", (req, res) => {
 
-  const userData = req.body;
-  const userMail = req.body.mail
+  const userData = req.body['0'];
+  const userMail = req.body['0'].mail
+  const userDataAddress = req.body['1'];
   console.log('userMail', userData.mail)
 
   connection.query(`SELECT mail FROM users WHERE mail = '${userMail}'`, (err, results) => {
@@ -33,8 +34,18 @@ router.post("/", (req, res) => {
           res.status(500).send("Erreur lors de la création de l'utilisateur");
         }
         else {
-          console.log(results)
-          res.sendStatus(200)
+          connection.query(`SELECT idUsers FROM users WHERE mail = '${userMail}'`, (err, results) => {
+            userDataAddress.idUsers = results['0'].idUsers;
+            connection.query('INSERT INTO userAdress SET ?', [userDataAddress], (err, results) => {
+              if (err) {
+                console.log(err);
+                res.status(500).send("Erreur lors de la création de l'utilisateur");
+              }
+              else {
+                res.sendStatus(200)
+              } 
+            });
+          });
         } 
       });
     } 
