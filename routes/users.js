@@ -1,6 +1,20 @@
 const express = require("express");
 const router = express.Router();
 const connection = require("../conf");
+const nodemailer = require("nodemailer");
+// Création de la méthode de transport de l'email 
+let transporter = nodemailer.createTransport({
+  host: 'smtp.mail.gmail.com',
+  port: 465,
+  service:'gmail',
+  secure: false,
+  auth: {
+      user: "*********",
+      pass: "*********"
+  }, 
+  debug: false,
+  logger: true
+});
 
 router.get("/", (req, res) => {
   connection.query('SELECT * FROM users', (err, results) => {
@@ -42,6 +56,21 @@ router.post("/", (req, res) => {
                 res.status(500).send("Erreur lors de la création de l'utilisateur");
               }
               else {
+<<<<<<< HEAD
+=======
+                transporter.sendMail({
+                  from: "OhMyFood", // Expediteur
+                  to: userMail, // Destinataires
+                  subject: "Création de votre compte", // Sujet
+                  text: `Merci d'avoir créé un compte chez OhMyFood, vous pourrez désormais accéder au service de commande en ligne de l'application avec votre adresse mail ${userMail}`, // plaintext body
+                }, (error, response) => {
+                    if(error){
+                        console.log(error);
+                    }else{
+                        console.log("Message sent: " + response.message);
+                    }
+                });
+>>>>>>> 22c6939cf4f7dd1d37151971951e0a0d7bd9c6b9
                 res.sendStatus(200)
               } 
             });
@@ -51,6 +80,32 @@ router.post("/", (req, res) => {
     } 
   });
 });
+
+router.post("/account", (req, res, next) => {
+  const userMail = req.body['0'];
+  let userId = '';
+  let mergeUserAndAdress = '';
+  connection.query(`SELECT * FROM users WHERE mail = '${userMail}'`, (err, results) => {
+    if(err) {
+      console.log(err);
+      return res.status(401).send({mess: "Vous n'avez pas accès aux données"});
+    }
+    userId = results['0'].idUsers
+    console.log('result', results)
+    connection.query(`SELECT * FROM userAdress WHERE idUsers = '${userId}'`, (err, resultsAdress) => {
+      if(err) {
+        console.log(err);
+        return res.status(401).send({mess: "Vous n'avez pas accès aux données"});
+      }
+      mergeUserAndAdress = {
+        '0': results['0'], 
+        '1': resultsAdress['0']
+      }
+      res.json(mergeUserAndAdress);
+      res.status(200)
+    })
+  })
+})
 
 
 router.put('/', (req, res) => {
