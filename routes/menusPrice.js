@@ -3,7 +3,7 @@ const router = express.Router();
 const connection = require("../conf");
 
 router.get("/", (req, res) => {
-    connection.query('SELECT * FROM menuPrices', (err, results) => {
+    connection.query('SELECT * FROM menusPrice', (err, results) => {
       if (err) {
         res.status(500).send("Erreur lors de l'affichage du prix des menus");
       } else {
