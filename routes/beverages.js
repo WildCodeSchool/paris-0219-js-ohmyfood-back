@@ -27,10 +27,10 @@ router.post("/", (req, res) => {
 });
 
 router.put("/", (req, res) => {
-	const id = req.body.idBeverages; // Get idBeverages
+	const bevName = req.body.bevName; // Get idBeverages
 	const beveragesUpdate = req.body; // Get all data
   
-	connection.query('UPDATE beverages SET ? WHERE idBeverages = ?', [beveragesUpdate, id], err => {
+	connection.query('UPDATE beverages SET ? WHERE bevName = ?', [beveragesUpdate, bevName], err => {
 	  if (err) {
 		res.status(500).send('Erreur lors de la modification de la boisson');
 	  	} else {
@@ -40,9 +40,9 @@ router.put("/", (req, res) => {
 });
 
 router.delete("/", (req, res) => {
-	const id = req.body.idBeverages;
+	const bevName = req.query.bevName;
   
-	connection.query('DELETE FROM beverages WHERE idBeverages = ?', [id], err => {
+	connection.query('DELETE FROM beverages WHERE bevName = ?', [bevName], err => {
 		if (err) {
 			res.status(500).send("Erreur lors de la suppression d'un dessert");
 		} else {

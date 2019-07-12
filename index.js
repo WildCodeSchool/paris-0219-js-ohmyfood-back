@@ -41,6 +41,7 @@ app.get('/', (req, res) => {
 app.use('/confirmOrder', routes.confirmOrder);
 app.use('/users', routes.users);
 app.use('/login', routes.login);
+app.use('/menusPrice', routes.menusPrice);
 
 app.listen(port, (err) => {
   if (err) {
