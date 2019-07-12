@@ -28,7 +28,7 @@ app.use('/desserts', routes.desserts);
 app.use('/confirmOrder', routes.confirmOrder);
 app.use('/users', routes.users);
 app.use('/login', routes.login);
-app.use('/menuPrices', routes.menuPrices);
+app.use('/menusPrice', routes.menusPrice);
 
 app.listen(port, (err) => {
   if (err) {
