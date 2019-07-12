@@ -56,8 +56,6 @@ router.post("/", (req, res) => {
                 res.status(500).send("Erreur lors de la création de l'utilisateur");
               }
               else {
-<<<<<<< HEAD
-=======
                 transporter.sendMail({
                   from: "OhMyFood", // Expediteur
                   to: userMail, // Destinataires
@@ -70,7 +68,6 @@ router.post("/", (req, res) => {
                         console.log("Message sent: " + response.message);
                     }
                 });
->>>>>>> 22c6939cf4f7dd1d37151971951e0a0d7bd9c6b9
                 res.sendStatus(200)
               } 
             });

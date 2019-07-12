@@ -12,15 +12,6 @@ router.post("/", (req, res) => {
     if (results.length === 0) {
       res.status(401).send("Vous n'avez pas de compte");
     } else {
-<<<<<<< HEAD
-      const token = jwt.sign(userData, jwtSecret, (err, token) => {
-          res.json({
-            token,
-            'userMail': results['0'].mail,
-            'userFirstName': results['0'].firstname,
-            'userLastName': results['0'].lastname,
-            'userRight': results['0'].userRight,
-=======
       connection.query(`SELECT firstname, lastname, mail, password FROM users WHERE mail = '${userMail}' AND password = '${userPssw}'`, (err, results) => {
         if(results[0].password.length === 0) {
           console.error(err);
@@ -36,7 +27,6 @@ router.post("/", (req, res) => {
                 'userRight': results['0'].userRight,
                 'userId': results['0'].idUsers
               })
->>>>>>> 22c6939cf4f7dd1d37151971951e0a0d7bd9c6b9
           })
           res.header("Access-Control-Expose-Headers", "x-access-token");
           res.set("x-access-token", token);
