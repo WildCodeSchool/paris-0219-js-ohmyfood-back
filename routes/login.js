@@ -22,7 +22,7 @@ router.post("/", (req, res) => {
 
       // User bcrypt to compare input password and password in database OR check password if it's not crypt
       if (bcrypt.compareSync(userPssw, results[0].password) || userPssw === results[0].password) {
-        connection.query(`SELECT firstname, lastname, mail, password FROM users WHERE mail = '${userMail}' AND password = '${results[0].password}'`, (err, results) => {
+        connection.query(`SELECT firstname, lastname, mail, password, userRight FROM users WHERE mail = '${userMail}' AND password = '${results[0].password}'`, (err, results) => {
           if(err) {
             res.send('error ', err);
           } else {
