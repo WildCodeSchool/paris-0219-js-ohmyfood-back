@@ -10,8 +10,8 @@ let transporter = nodemailer.createTransport({
   service:'gmail',
   secure: false,
   auth: {
-      user: "bernini.marc@gmail.com",
-      pass: "Philadelphia76ers"
+      user: "*******",
+      pass: "******"
   }, 
   debug: false,
   logger: true
