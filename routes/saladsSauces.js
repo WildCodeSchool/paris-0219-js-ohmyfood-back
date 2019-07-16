@@ -26,10 +26,11 @@ router.post('/', (req, res) => {
 
 router.put('/', (req, res) => {
   nameSauce = '';
+  console.log(req.body)
 
   if (req.body.saladsSaucesName.indexOf('|') != -1) {
     nameSauce = req.body.saladsSaucesName.split('|')[0];
-    req.body.saladsSaucesName = re.body.saladsSaucesName.split('|')[1];
+    req.body.saladsSaucesName = req.body.saladsSaucesName.split('|')[1];
   } else {
     nameSauce = req.body.saladsSaucesName;
   }
@@ -46,7 +47,7 @@ router.put('/', (req, res) => {
 
 router.delete('/', (req, res) => {
 
-  const name = req.query.saladsSaucesName;
+  const name = req.query.saladsSaucesName
 
   connection.query('DELETE FROM saladsSauces WHERE saladsSaucesName = ?', [name], (err, results)  => {
     if (err) {

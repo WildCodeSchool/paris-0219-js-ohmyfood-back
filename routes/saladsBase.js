@@ -36,7 +36,7 @@ router.put('/', (req, res) => {
   }
   const updateSaladBase = req.body;
 
-  connection.query('UPDATE saladsBase SET ? WHERE saladsBaseName = ?', [updateSaladBase, nameBase], err => {
+  connection.query('UPDATE saladsBase SET ? WHERE saladsBaseName = ?', [updateSaladBase, nameBase], (err, results) => {
     if (err) {
       res.status(500).send('Erreur lors de la mise à jour de la base salade');
     } else {
@@ -46,9 +46,9 @@ router.put('/', (req, res) => {
 });
 
 router.delete('/', (req, res) => {
-  const name = req.query.saladsBaseName;
+  const name = req.query.saladsBaseName
 
-  connection.query('DELETE FROM saladsBase WHERE saladsBaseName = ?', [name], err => {
+  connection.query('DELETE FROM saladsBase WHERE saladsBaseName = ?', [name], (err, results) => {
     if (err) {
       res.status(500).send('Erreur lors de la suppression de la base salade');
     } else {
