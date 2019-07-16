@@ -107,73 +107,56 @@ router.post("/", (req, res) => {
 
             // POST saladsComposed TABLE
             createOrder.salad.map(salad => {
-              connection.query(`INSERT INTO saladsComposed (saladsComposedPrice, idSaladsSauces) VALUES ` +
-              `(${salad.saladsComposedPriceTotal}, ${salad.multiSauces.idSaladsSauces})`, (err, results) => {
+              connection.query(`INSERT INTO saladsComposed (saladsComposedPrice, idSaladsSauces, saladsComposedQuantity, idOrders) VALUES ` +
+              `(${salad.saladsComposedPriceTotal}, ${salad.multiSauces.idSaladsSauces}, ${salad.saladsComposedQuantity}, ${orderId})`, (err, results) => {
                 if (err) {
                   return connection.rollback(_ => {
                     res.status(500).send("error from saladsComposed");
                     throw err;
                   });
-                };        
-              });
-            });
+                } else {
+                    const saladComposedId = results.insertId; // get saladComposedId from post above
+                    // POST multiBases TABLE
+                    salad.multiBases.map(bases => {
+                      connection.query(`INSERT INTO multiBases (idSaladsBase, idSaladsComposed, multiBasesQuantity) VALUES ` +
+                      `(${bases.idSaladsBase}, ${saladComposedId}, ${bases.multiBasesQuantity})`, (err, results) => {
+                          if (err) {
+                            return connection.rollback(_ => {
+                              res.status(500).send("error from multiBases");
+                              throw err;
+                            });
+                          };
+                        });
+                      });
+            
 
-            // POST multiBases TABLE
-            for (const salad of createOrder.salad) {
-              salad.multiBases.map((bases, i) => {
-                connection.query(`INSERT INTO multiBases (idSaladsBase, idSaladsComposed, multiBasesQuantity) VALUES ` +
-                `(${bases.idSaladsBase}, ${i + 1}, ${bases.multiBasesQuantity})`, (err, results) => {
-                  if (err) {
-                    return connection.rollback(_ => {
-                      res.status(500).send("error from multiBases");
-                      throw err;
-                    });
+                    // POST multiIngredients TABLE
+                    salad.multiIngredients.map(ingredients => {
+                      connection.query(`INSERT INTO multiIngredients (idSaladsIngredients, idSaladsComposed, multiIngredientsQuantity) VALUES ` + 
+                      `(${ingredients.idSaladsIngredients}, ${saladComposedId}, ${ingredients.multiIngredientsQuantity})`, (err, results) => {
+                          if (err) {
+                            return connection.rollback(_ => {
+                              res.status(500).send("error from multiIngredients");
+                              throw err;
+                            });
+                          };
+                        });
+                      });
+
+                    // POST multiToppings TABLE
+                    salad.multiToppings.map(toppings => {
+                      connection.query(`INSERT INTO multiToppings (idSaladsToppings, idSaladsComposed, multiToppingsQuantity) VALUES ` + 
+                      `(${toppings.idSaladsToppings}, ${saladComposedId}, ${toppings.multiToppingsQuantity})`, (err, results) => {
+                          if (err) {
+                            return connection.rollback(_ => {
+                              res.status(500).send("error from multiToppings");
+                              throw err;
+                            });
+                          };
+                        });
+                      });
                   };
                 });
-              });
-            };
-
-            // POST multiIngredients TABLE
-            for (const salad of createOrder.salad) {
-              salad.multiIngredients.map((ingredients, i) => {
-                connection.query(`INSERT INTO multiIngredients (idSaladsIngredients, idSaladsComposed, multiIngredientsQuantity) VALUES ` + 
-                `(${ingredients.idSaladsIngredients}, ${i + 1}, ${ingredients.multiIngredientsQuantity})`, (err, results) => {
-                  if (err) {
-                    return connection.rollback(_ => {
-                      res.status(500).send("error from multiIngredients");
-                      throw err;
-                    });
-                  };
-                });
-              });
-            };
-
-            // POST multiToppings TABLE
-            for (const salad of createOrder.salad) {
-              salad.multiToppings.map((toppings, i) => {
-                connection.query(`INSERT INTO multiToppings (idSaladsToppings, idSaladsComposed, multiToppingsQuantity) VALUES ` + 
-                `(${toppings.idSaladsToppings}, ${i + 1}, ${toppings.multiToppingsQuantity})`, (err, results) => {
-                  if (err) {
-                    return connection.rollback(_ => {
-                      res.status(500).send("error from multiToppings");
-                      throw err;
-                    });
-                  };
-                });
-              });
-            };
-
-            // POST saladsComposedOrders
-            createOrder.salad.map((saladComposedOrder, i) => {
-              connection.query(`INSERT INTO saladsComposedOrders (idSaladsComposed, idOrders, saladsComposedQuantity) VALUES ` + 
-              `(${i + 1}, ${orderId}, ${saladComposedOrder.saladsComposedQuantity})`, (err, results) => {
-                if (err) {
-                  return connection.rollback(_ => {
-                    res.status(500).send("error from saladsComposedOrders");
-                    throw err;
-                  });
-                };
-              });
             });
 
             createOrder.beverage.map(beverages => {
@@ -212,30 +195,82 @@ router.post("/", (req, res) => {
               });
             });
             
-            createOrder.menuSalad.map((menuSalads, i) => {
-              connection.query(`INSERT INTO menu (idOrders, idBeverages, idDesserts, idSaladsComposed, menuSaladPrice, menuQuantity) VALUES ` +
-              `(${orderId}, ${menuSalads.beverage.idBeverages}, ${menuSalads.dessert.idDesserts}, ${i + 1}, ${menuSalads.menuSaladPriceTotal}, ${menuSalads.menuSaladQuantity})`, (err, results) => {
+            createOrder.menuSalad.map(menuSalads => {
+              connection.query(`INSERT INTO saladsComposed (saladsComposedPrice, idSaladsSauces, saladsComposedQuantity, idOrders) VALUES ` +
+              `(${+menuSalads.salad.orderSaladsPriceTotal}, ${menuSalads.salad.orderSaladsSauces.idSaladsSauces}, ${menuSalads.salad.orderSaladsQuantity}, ${orderId})`, (err, results) => {
                 if (err) {
                   return connection.rollback(_ => {
-                    res.status(500).send("Error from menu, salad");
+                    res.status(500).send("error from saladsComposed");
                     throw err;
                   });
-                };
-              });
-            });
-          };
-        });
+                } else {
+                    const saladComposedId = results.insertId; // get saladComposedId from post above
+                    // POST multiBases TABLE
+                    menuSalads.salad.orderSaladsBases.map(bases => {
+                      connection.query(`INSERT INTO multiBases (idSaladsBase, idSaladsComposed, multiBasesQuantity) VALUES ` +
+                      `(${bases.idSaladsBases}, ${saladComposedId}, ${bases.saladsBasesQuantity})`, (err, results) => {
+                          if (err) {
+                            return connection.rollback(_ => {
+                              res.status(500).send("error from multiBases");
+                              throw err;
+                            });
+                          };
+                        });
+                      });
+            
 
-        connection.commit( err => {
-          if (err) {
-            return connection.rollback( _ => {
-              res.status(500).send("error from orders");
-              throw err
-            })
-          }
-        })
-        res.status(200).json({ results: "send" });
+                    // POST multiIngredients TABLE
+                    menuSalads.salad.orderSaladsIngredients.map(ingredients => {
+                      connection.query(`INSERT INTO multiIngredients (idSaladsIngredients, idSaladsComposed, multiIngredientsQuantity) VALUES ` + 
+                      `(${ingredients.idSaladsIngredients}, ${saladComposedId}, ${ingredients.saladsIngredientsQuantity})`, (err, results) => {
+                          if (err) {
+                            return connection.rollback(_ => {
+                              res.status(500).send("error from multiIngredients");
+                              throw err;
+                            });
+                          };
+                        });
+                      });
+
+                    // POST multiToppings TABLE
+                    menuSalads.salad.orderSaladsToppings.map(toppings => {
+                      connection.query(`INSERT INTO multiToppings (idSaladsToppings, idSaladsComposed, multiToppingsQuantity) VALUES ` + 
+                      `(${toppings.idSaladsToppings}, ${saladComposedId}, ${toppings.saladsToppingsQuantity})`, (err, results) => {
+                          if (err) {
+                            return connection.rollback(_ => {
+                              res.status(500).send("error from multiToppings");
+                              throw err;
+                            });
+                          };
+                        });
+                      });
+              
+                    connection.query(`INSERT INTO menu (idOrders, idBeverages, idDesserts, idSaladsComposed, menuSaladPrice, menuQuantity) VALUES ` +
+                    `(${orderId}, ${menuSalads.beverage.idBeverages}, ${menuSalads.dessert.idDesserts}, ${saladComposedId}, ${+menuSalads.menuSaladPriceTotal}, ${menuSalads.menuSaladQuantity})`, (err, results) => {
+                      if (err) {
+                        return connection.rollback(_ => {
+                          res.status(500).send("Error from menu, salad");
+                          throw err;
+                        });
+                      };
+                    });
+                  }
+                });
+            });
+        }
+      });
+
+      connection.commit( err => {
+        if (err) {
+          return connection.rollback( _ => {
+            res.status(500).send("error from orders");
+            throw err
+          })
+        }
+      })
+      res.status(200).json({ results: "send" });
   })
 });
+
 
 module.exports = router;
