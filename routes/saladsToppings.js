@@ -26,10 +26,18 @@ router.post('/', (req, res) => {
 });
 
 router.put('/', (req, res) => {
-  const id = req.body.idSaladsToppings;
-  const updateSaladTop = req.body;
+  nameTop = '';
 
-  connection.query('UPDATE saladsToppings SET ? WHERE idSaladsToppings = ?', [updateSaladTop, id], err  => {
+  if (req.body.saladsToppingsName.indexOf('|') != -1) {
+    nameTop = req.body.saladsToppingsName.split('|')[0];
+    req.body.saladsToppingsName = req.body.saladsToppingsName.split('|')[1];
+  } else {
+    nameTop = req.body.saladsToppingsName;
+  }
+  const updateSaladTop = req.body;
+  console.log(req.body.saladsToppingsName)
+
+  connection.query('UPDATE saladsToppings SET ? WHERE saladsToppingsName = ?', [updateSaladTop, nameTop], (err, results)  => {
     if (err) {
       res.status(500).send('Erreur lors de la mise à jour du topping');
     } else {
@@ -39,8 +47,10 @@ router.put('/', (req, res) => {
 });
 
 router.delete('/', (req, res) => {
-  const id = req.body.idSaladsToppings
-  connection.query('DELETE FROM saladsToppings WHERE idSaladsToppings = ?', [id], (err, results)  => {
+
+  const name = req.query.saladsToppingsName
+
+  connection.query('DELETE FROM saladsToppings WHERE saladsToppingsName = ?', [name], (err, results)  => {
     if (err) {
       res.status(500).send('Erreur lors de la suppression du topping');
     } else {
