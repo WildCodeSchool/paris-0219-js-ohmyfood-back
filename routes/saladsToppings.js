@@ -26,10 +26,17 @@ router.post('/', (req, res) => {
 });
 
 router.put('/', (req, res) => {
-  const name = req.body.saladsToppingsName;
+  nameTop = '';
+
+  if (req.body.saladsToppingsName.indexOf('|') != -1) {
+    nameTop = req.body.saladsToppingsName.split('|')[0];
+    req.body.saladsToppingsName = req.body.saladsToppingsName.split('|')[1];
+  } else {
+    nameTop = req.body.saladsToppingsName;
+  }
   const updateSaladTop = req.body;
 
-  connection.query('UPDATE saladsToppings SET ? WHERE saladsToppingsName = ?', [updateSaladTop, name], err  => {
+  connection.query('UPDATE saladsToppings SET ? WHERE saladsToppingsName = ?', [updateSaladTop, nameTop], err  => {
     if (err) {
       res.status(500).send('Erreur lors de la mise à jour du topping');
     } else {
@@ -39,7 +46,9 @@ router.put('/', (req, res) => {
 });
 
 router.delete('/', (req, res) => {
-  const name = req.body.saladsToppingsName
+  
+  const name = req.query.saladsToppingsName
+
   connection.query('DELETE FROM saladsToppings WHERE saladsToppingsName = ?', [name], (err, results)  => {
     if (err) {
       res.status(500).send('Erreur lors de la suppression du topping');
