@@ -151,7 +151,30 @@ router.post("/", (req, res) => {
                 };
               });
             });
+
+            createOrder.menuPizza.map(menuPizzas => {
+              connection.query(`INSERT INTO menu (idPizzas, idOrders, idBeverages, idDesserts, menuPizzPrice, menuQuantity) VALUES ` +
+              `(${menuPizzas.pizza.idPizzas}, ${orderId}, ${menuPizzas.beverage.idBeverages}, ${menuPizzas.dessert.idDesserts}, ${menuPizzas.menuPizzPriceTotal}, ${menuPizzas.menuPizzQuantity})`, (err, results) => {
+                if (err) {
+                  return connection.rollback(_ => {
+                    res.status(500).send("Error from menu, pizza");
+                    throw err;
+                  });
+                };
+              });
+            });
             
+            createOrder.menuSalad.map(menuSalads => {
+              connection.query(`INSERT INTO menu (idOrders, idBeverages, idDesserts, idSaladsComposed, menuSaladPrice, menuQuantity) VALUES ` +
+              `(${orderId}, ${menuSalads.beverage.idBeverages}, ${menuSalads.dessert.idDesserts}, ${saladComposedId}, ${menuSalads.menuSaladPriceTotal}, ${menuSalads.menuSaladQuantity})`, (err, results) => {
+                if (err) {
+                  return connection.rollback(_ => {
+                    res.status(500).send("Error from menu, salad");
+                    throw err;
+                  });
+                };
+              });
+            });
             };
           });
 
