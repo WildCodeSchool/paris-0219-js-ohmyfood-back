@@ -2,6 +2,7 @@ const express = require("express");
 const router = express.Router();
 const connection = require("../conf");
 const nodemailer = require("nodemailer");
+const bcrypt = require("bcrypt");
 // Création de la méthode de transport de l'email 
 let transporter = nodemailer.createTransport({
   host: 'smtp.mail.gmail.com',
@@ -9,8 +10,8 @@ let transporter = nodemailer.createTransport({
   service:'gmail',
   secure: false,
   auth: {
-      user: "*********",
-      pass: "*********"
+      user: "*******",
+      pass: "******"
   }, 
   debug: false,
   logger: true
@@ -31,7 +32,6 @@ router.post("/", (req, res) => {
   const userData = req.body['0'];
   const userMail = req.body['0'].mail
   const userDataAddress = req.body['1'];
-  console.log('userMail', userData.mail)
 
   connection.query(`SELECT mail FROM users WHERE mail = '${userMail}'`, (err, results) => {
     if (err) {
@@ -42,38 +42,46 @@ router.post("/", (req, res) => {
       res.status(409, 'L\'email existe déja dans la base de donnée')
     } 
     else {
-      connection.query('INSERT INTO users SET ?', [userData], (err, results) => {
+      // User bcrypt package to crypt user password
+      bcrypt.hash(userData.password, 10, (err, hash) => {
+        userData.password = hash; // Hash user password
         if (err) {
-          console.log(err);
-          res.status(500).send("Erreur lors de la création de l'utilisateur");
+          res.send('error ', err)
         }
-        else {
-          connection.query(`SELECT idUsers FROM users WHERE mail = '${userMail}'`, (err, results) => {
-            userDataAddress.idUsers = results['0'].idUsers;
-            connection.query('INSERT INTO userAdress SET ?', [userDataAddress], (err, results) => {
-              if (err) {
-                console.log(err);
-                res.status(500).send("Erreur lors de la création de l'utilisateur");
-              }
-              else {
-                transporter.sendMail({
-                  from: "OhMyFood", // Expediteur
-                  to: userMail, // Destinataires
-                  subject: "Création de votre compte", // Sujet
-                  text: `Merci d'avoir créé un compte chez OhMyFood, vous pourrez désormais accéder au service de commande en ligne de l'application avec votre adresse mail ${userMail}`, // plaintext body
-                }, (error, response) => {
-                    if(error){
-                        console.log(error);
-                    }else{
-                        console.log("Message sent: " + response.message);
-                    }
-                });
-                res.sendStatus(200)
-              } 
+
+        connection.query('INSERT INTO users SET ?', [userData], (err, results) => {
+          if (err) {
+            console.log(err);
+            res.status(500).send("Erreur lors de la création de l'utilisateur");
+          }
+          else {
+            connection.query(`SELECT idUsers FROM users WHERE mail = '${userMail}'`, (err, results) => {
+              userDataAddress.idUsers = results['0'].idUsers;
+              connection.query('INSERT INTO userAdress SET ?', [userDataAddress], (err, results) => {
+                if (err) {
+                  console.log(err);
+                  res.status(500).send("Erreur lors de la création de l'utilisateur");
+                }
+                else {
+                  transporter.sendMail({
+                    from: "OhMyFood", // Expediteur
+                    to: userMail, // Destinataires
+                    subject: "Création de votre compte", // Sujet
+                    text: `Merci d'avoir créé un compte chez OhMyFood, vous pourrez désormais accéder au service de commande en ligne de l'application avec votre adresse mail ${userMail}`, // plaintext body
+                  }, (error, response) => {
+                      if(error){
+                          console.log(error);
+                      }else{
+                          console.log("Message sent: " + response.message);
+                      }
+                  });
+                  res.sendStatus(200)
+                } 
+              });
             });
-          });
-        } 
-      });
+          } 
+        });
+      })
     } 
   });
 });
