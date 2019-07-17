@@ -4,6 +4,21 @@ const connection = require("../conf");
 const jwt = require("jsonwebtoken");
 const jwtSecret = require("../jwtSecret");
 const bcrypt = require("bcrypt");
+const nodemailer = require('nodemailer');
+
+// Création de la méthode de transport de l'email 
+let transporter = nodemailer.createTransport({
+  host: 'smtp.mail.gmail.com',
+  port: 465,
+  service:'gmail',
+  secure: false,
+  auth: {
+      user: "*********",
+      pass: "*********"
+  }, 
+  debug: false,
+  logger: true
+});
 
 router.post("/", (req, res) => {
   const userData = req.body;
@@ -35,17 +50,17 @@ router.post("/", (req, res) => {
                   'userLastName': results['0'].lastname,
                   'userRight': results['0'].userRight,
                   'userId': results['0'].idUsers
-                })
-            })
+                });
+            });
             res.header("Access-Control-Expose-Headers", "x-access-token");
             res.set("x-access-token", token);
             res.status(200);
           }
-        })
+        });
       }  
     }
-  })
-})
+  });
+});
 
 // vérifier le token pour les pages protégées 
 
@@ -62,7 +77,36 @@ router.post("/protected", (req, res, next) => {
     console.log('decode',decoded);
     return res.status(200).send({mess: 'User Datas', objectTests });
   })
-})
+});
+
+router.post("/forgottenPassword", (req, res) => {
+  console.log(req.body)
+  const userMail = req.body.userMail;
+  const token = req.body.token;
+
+  connection.query(`SELECT mail FROM users WHERE mail = '${userMail}'`, (err, results) => {
+    if (err) {
+      console.log(err);
+      res.status(500).send("Erreur lors de la vérification de l'email");
+    } else {
+      transporter.sendMail({
+        from: "OhMyFood", // Expediteur
+        to: userMail, // Destinataires
+        subject: "Récupération de votre mot de passe", // Sujet
+        text: `Ce mail vous est destiné dans le cas où vous avez fait une demande de nouveau mot de passe. Cliquez sur le lien suivant pour continuer la procédure : 
+        http://localhost:3000/${token}
+          Dans le cas où vous n'avez pas fait cette demande, contactez l'équipe d'OhMyFood pour que ceux-ci puissent résoudre le problème le plus rapidement possible.
+        `, // plaintext body
+      }, (error, response) => {
+          if(error){
+              console.log(error);
+          }else{
+              console.log("Message sent: " + response.message);
+          }
+      });
+    }
+  });
+});
 
 // Verify token function
 

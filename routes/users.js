@@ -96,7 +96,6 @@ router.post("/account", (req, res, next) => {
       return res.status(401).send({mess: "Vous n'avez pas accès aux données"});
     }
     userId = results['0'].idUsers
-    console.log('result', results)
     connection.query(`SELECT * FROM userAdress WHERE idUsers = '${userId}'`, (err, resultsAdress) => {
       if(err) {
         console.log(err);
