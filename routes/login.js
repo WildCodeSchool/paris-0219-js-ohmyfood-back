@@ -96,7 +96,7 @@ router.post("/forgottenPassword", (req, res) => {
         to: userMail, // Destinataires
         subject: "Récupération de votre mot de passe", // Sujet
         text: `Ce mail vous est destiné dans le cas où vous avez fait une demande de nouveau mot de passe. Cliquez sur le lien suivant pour continuer la procédure : 
-        http://localhost:4200/newPassword/${results[0].forgotPassword}
+        http://localhost:4200/TzApeyaNpBzRJmGrit59K4NJ5Cy/${results[0].forgotPassword}
           Dans le cas où vous n'avez pas fait cette demande, contactez l'équipe d'OhMyFood pour que ceux-ci puissent résoudre le problème le plus rapidement possible.
         `, // plaintext body
       }, (error, response) => {
@@ -110,12 +110,15 @@ router.post("/forgottenPassword", (req, res) => {
   });
 });
 
-router.post("/newPassword", (req, res) => {
+router.post("/TzApeyaNpBzRJmGrit59K4NJ5Cy", (req, res) => {
   const userToken = req.body.token
   connection.query(`SELECT forgotPassword FROM users WHERE forgotPassword = '${userToken}'`, (err, results) => {
     if (err) {
       res.status(500).send("Le token ne correspond pas")
-    } else {
+    } else if (results.length == 0){
+      res.status(401).send("Le token ne correspond pas")
+    } else { 
+      res.json({token: `${userToken}`})
       res.status(200)
     }
   });
