@@ -6,11 +6,15 @@ const sqlRequestUserAddress = userId =>
     `SELECT userAddress1, userAddress2, zipcode, city, userFacturation, userAddressFacturation FROM userAddress ` +
     `WHERE idUsers = ${userId}`;
 
-const userAddressTableData = userId => {
+const userAddressTableData = orderInfo => {
     return new Promise((resolve, reject) => {
-        connection.query(sqlRequestUserAddress(userId), (err, results) => {
-            if (err) reject([err, 'userAddressTable']);
-            resolve(results);
+        const result = [];
+        orderInfo.map((ordersInfos, i) => {
+            connection.query(sqlRequestUserAddress(ordersInfos.idUsers), (err, results) => {
+                if (err) reject([err, 'userAddressTable']);
+                result.push(results[0]);
+                if (i === results.length) resolve(result);
+            });
         });
     });
 };

@@ -5,6 +5,7 @@ const getMenuPizz =  require("../getDataOrders/getMenuPizz");
 const getOrdersId = require("../getDataOrders/getOrdersId");
 const getUserAddress = require("../getDataOrders/getUserAddress");
 const getPizzas = require("../getDataOrders/getPizzas");
+const getBeverages = require("../getDataOrders/getBeverages");
 
 router.get("/", (req, res) => {
   const detailOrderList = [];
@@ -13,38 +14,33 @@ router.get("/", (req, res) => {
   // First from ordersTable
   getOrdersId.ordersTableData()
   .then(ordersInfo => {
-    detailOrderList.push(ordersInfo[0]); // Push results in final response which is an array
-    const orderId = ordersInfo[0].idOrders; // Get orderId for later
-    const userId = ordersInfo[0].idUsers; // Get userId for later
+    detailOrderList.push(ordersInfo); // Push results in final response which is an array
+
 
     // Get userAddress informations
-    getUserAddress.userAddressTableData(userId)
+    getUserAddress.userAddressTableData(ordersInfo)
     .then(userAddressInfos => {
       detailOrderList.push(userAddressInfos) // Push results in final response
 
+      // Get Pizzas details
       getPizzas.getPizzasDetails()
       .then(pizzasDetails => {
-        detailOrderList.push(pizzasDetails);
-        console.log('detailOrderList ', detailOrderList);
+        detailOrderList.push(pizzasDetails); // Push results in final response
 
-        /* getMenuPizz.menuPizzasData(orderId)
-        .then(idMenuPizz => {
-          getMenuPizz.detailPizzaMenu(idMenuPizz)
-          .then(detailMenuPizz => {
-            detailOrderList.push(detailMenuPizz) */
+        // Get Beverages details
+        getBeverages.getBeveragesDetails()
+        .then(beveragesDetails => {
+          detailOrderList.push(beveragesDetails) // Push results in final response
+          console.log('detailOrderList ', detailOrderList);
+          /* getMenuPizz.menuPizzasData(orderId)
+          .then(idMenuPizz => {
+            getMenuPizz.detailPizzaMenu(idMenuPizz)
+            .then(detailMenuPizz => {
+              detailOrderList.push(detailMenuPizz) */
+        })
+
           });
         });
-      });
-      //beverages
-      connection.query(`SELECT bevName, bevQuantity FROM beveragesOrders ` + 
-      `JOIN beverages ON beverages.idBeverages = beveragesOrders.idBeverages ` + 
-      `JOIN orders ON orders.idOrders = beveragesOrders.idOrders ` +
-      `WHERE isMenuBev IS NULL`, (err, results) => {
-        if (err) {
-          res.status(500).send("Erreur lors de la récupération des boissons");
-        } else {
-          detailOrderList.push(results);
-        }
       });
       // desserts
       connection.query(`SELECT dessName, dessQuantity FROM dessertsOrders ` + 
