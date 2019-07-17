@@ -57,7 +57,7 @@ router.post("/", (req, res) => {
           else {
             connection.query(`SELECT idUsers FROM users WHERE mail = '${userMail}'`, (err, results) => {
               userDataAddress.idUsers = results['0'].idUsers;
-              connection.query('INSERT INTO userAdress SET ?', [userDataAddress], (err, results) => {
+              connection.query('INSERT INTO userAddress SET ?', [userDataAddress], (err, results) => {
                 if (err) {
                   console.log(err);
                   res.status(500).send("Erreur lors de la création de l'utilisateur");
