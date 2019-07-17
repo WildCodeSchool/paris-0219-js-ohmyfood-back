@@ -5,58 +5,105 @@ const connection = require("../conf");
 router.get("/", (req, res) => {
   const detailOrderList = [];
 
-  connection.query('SELECT users.idUsers, firstname, lastname, mail, phoneNumber, idOrders, dateOrder, orderPrice, userMessage FROM users JOIN orders ON orders.idUsers = users.idUsers', (err, results) => {
+  connection.query('SELECT users.idUsers, firstname, lastname, mail, phoneNumber, ' +
+  'idOrders, dateOrder, orderPrice, userMessage FROM users JOIN orders ON orders.idUsers = users.idUsers', (err, results) => {
     if (err) {
-      res.status(500).send("Erreur lors de l'affichage de la commande");
+      res.status(500).send("Erreur lors de la récupération de la commande");
     } else {
       detailOrderList.push(results[0]);
+      const orderId = results[0].idOrders;
       const userId = results[0].idUsers;
-      connection.query(`SELECT userAddress1, userAddress2, zipcode, city, userFacturation, userAddressFacturation FROM userAdress WHERE idUsers = ${userId}`, (err, results) => {
+      connection.query(`SELECT userAddress1, userAddress2, zipcode, city, userFacturation, userAddressFacturation FROM userAddress ` +
+       `WHERE idUsers = ${userId}`, (err, results) => {
         if (err) {
-          res.status(500).send("Erreur lors de l'affichage des adresses");
+          res.status(500).send("Erreur lors de la récupération des adresses");
         } else {
           detailOrderList.push(results[0]);
 
           //pizzas
-          connection.query(`SELECT pizzName, pizzasQuantity FROM pizzasOrders JOIN pizzas ON pizzas.idPizzas = pizzasOrders.idPizzas JOIN orders ON orders.idOrders = pizzasOrders.idOrders`, (err, results) => {
+          connection.query(`SELECT pizzName, pizzasQuantity FROM pizzasOrders ` + 
+          `JOIN pizzas ON pizzas.idPizzas = pizzasOrders.idPizzas ` + 
+          `JOIN orders ON orders.idOrders = pizzasOrders.idOrders`, (err, results) => {
             if (err) {
-              res.status(500).send("Erreur lors de l'affichage des pizzas");
+              res.status(500).send("Erreur lors de la récupération des pizzas");
             } else {
               detailOrderList.push(results);
             }
           });
           //beverages
-          connection.query(`SELECT bevName, bevQuantity FROM beveragesOrders JOIN beverages ON beverages.idBeverages = beveragesOrders.idBeverages JOIN orders ON orders.idOrders = beveragesOrders.idOrders`, (err, results) => {
+          connection.query(`SELECT bevName, bevQuantity FROM beveragesOrders ` + 
+          `JOIN beverages ON beverages.idBeverages = beveragesOrders.idBeverages ` + 
+          `JOIN orders ON orders.idOrders = beveragesOrders.idOrders`, (err, results) => {
             if (err) {
-              res.status(500).send("Erreur lors de l'affichage des boissons");
+              res.status(500).send("Erreur lors de la récupération des boissons");
             } else {
               detailOrderList.push(results);
             }
           });
           // desserts
-          connection.query(`SELECT dessName, dessQuantity FROM dessertsOrders JOIN desserts ON desserts.idDesserts = dessertsOrders.idDesserts JOIN orders ON orders.idOrders = dessertsOrders.idOrders`, (err, results) => {
+          connection.query(`SELECT dessName, dessQuantity FROM dessertsOrders ` + 
+          `JOIN desserts ON desserts.idDesserts = dessertsOrders.idDesserts ` + 
+          `JOIN orders ON orders.idOrders = dessertsOrders.idOrders`, (err, results) => {
             if (err) {
-              res.status(500).send("Erreur lors de l'affichage des desserts");
+              res.status(500).send("Erreur lors de la récupération des desserts");
             } else {
               detailOrderList.push(results);
             };
           });
+          
           // salads
-          connection.query(`SELECT saladsComposed.idSaladsSauces, saladsComposed.idSaladsComposed, saladsComposedQuantity, saladsComposedPrice FROM saladsComposedOrders ` +
-           `JOIN saladsComposed ON saladsComposed.idSaladsComposed = saladsComposedOrders.idSaladsComposed ` + 
-           `JOIN orders ON orders.idOrders = saladsComposedOrders.idOrders`, (err, results) => {
-             if (err) {
-               res.status(500).send(results);
-             } else {
-               console.log(results);
-               connection.query(``, (err, results) => {
+          connection.query(`SELECT saladsComposed.idSaladsSauces, saladsComposed.idSaladsComposed, saladsComposedQuantity, saladsComposedPrice ` + 
+          `FROM saladsComposed`, (err, results) => {
+            if (err) {
+              res.status(500).send("Erreur lors de la récupération des salades composées");
+            } else {
+              detailOrderList.push(results);
+            };
+          });
+          
+          // menu pizza
+          connection.query(`SELECT idOrders, idPizzas, idBeverages, idDesserts, menuPizzPrice, menuQuantity FROM menu ` + 
+          `WHERE menu.idOrders = ${orderId} AND idPizzas IS NOT NULL`, (err, results) => {
+            if (err) {
+              res.status(500).send("Erreur lors de la récupération des menus pizza");
+            } else {
+                results.map(menuPizza => {
+                  connection.query(`SELECT isMenuPizz, isMenuBev, isMenuDess FROM orders ` + 
+                  `JOIN pizzasOrders ON pizzasOrders.idPizzas = ${orderId} ` +
+                  `JOIN beveragesOrders ON beveragesOrders.idBeverages = ${orderId} ` +
+                  `JOIN dessertsOrders ON dessertsOrders.idDesserts = ${orderId}`, (err, results) => {
+                    if (err) {
+                      res.status(500).send("Erreur lors de la récupération du booléen permettant de savoir s'il s'agit d'un menu ou non.")
+                    } else {
+                      const isMenuPizz = results[0].isMenuPizz;
+                      const isMenuBev = results[0].isMenuBev;
+                      const isMenuDess = results[0].isMenuDess;
+                      console.log(isMenuPizz, isMenuBev, isMenuDess);
+                      
+                      connection.query(`SELECT pizzName, bevName, dessName FROM menu ` +
+                      `JOIN pizzas ON pizzas.idPizzas = ${menuPizza.idPizzas} ` + 
+                      `JOIN beverages ON beverages.idBeverages = ${menuPizza.idBeverages} ` +
+                      `JOIN desserts ON desserts.idDesserts = ${menuPizza.idDesserts} ` +
+                      `JOIN pizzasOrders ON pizzasOrders.idPizzas = ${menuPizza.idPizzas} `
+                      `WHERE menu.idOrders = ${orderId} ` + 
+                      `AND ${isMenuPizz} IS NOT NULL AND ${isMenuBev} IS NOT NULL AND ${isMenuDess} IS NOT NULL`, (err, results) => {
+                        if (err) {
+                          res.status(500).send("Erreur lors de la récupération du détail des menus pizzas")
+                        } else {
+                        console.log(results);
+                        }
+                    })
+                    }
+                  })
 
-               });
-             };
-           });
-        };
+                })
+                
+              
+            }
+          } 
+        )};
+        res.status(200).send(detailOrderList);
       });
-      res.status(200).send(detailOrderList);
     };
   });
 });
@@ -79,7 +126,7 @@ router.post("/", (req, res) => {
     if (err) {
       throw err
     }
-    
+
     // POST orders TABLE
     connection.query(`INSERT INTO orders (dateOrder, orderMessage, orderPrice, userMessage, idUsers, deliveryAddress, facturationAddress) VALUES ` + 
       `('${orderDate}', 'Merci d avoir commandé chez Ohmyfood', ${orderPrice}, '${userDetail.comment}', ${userDetail.idUsers}, ` + 
@@ -95,8 +142,8 @@ router.post("/", (req, res) => {
 
             // POST pizzasOrders TABLE
             createOrder.pizza.map(pizz => {
-              connection.query(`INSERT INTO pizzasOrders (idOrders, pizzasQuantity, idPizzas) VALUES ` + 
-            `(${orderId}, ${pizz.pizzQuantity}, ${pizz.idPizzas})`, (err, results) => {
+              connection.query(`INSERT INTO pizzasOrders (idOrders, pizzasQuantity, idPizzas, isMenuPizz) VALUES ` + 
+            `(${orderId}, ${pizz.pizzQuantity}, ${pizz.idPizzas}, ${0})`, (err, results) => {
               if (err) {
                 return connection.rollback(_ => {
                   res.status(500).send("error from pizzasOrder");
@@ -161,8 +208,8 @@ router.post("/", (req, res) => {
             });
 
             createOrder.beverage.map(beverages => {
-              connection.query(`INSERT INTO beveragesOrders (idOrders, idBeverages, bevQuantity) VALUES ` + 
-              `(${orderId}, ${beverages.idBeverages}, ${beverages.bevQuantity})`, (err, results) => {
+              connection.query(`INSERT INTO beveragesOrders (idOrders, idBeverages, bevQuantity, isMenuBev) VALUES ` + 
+              `(${orderId}, ${beverages.idBeverages}, ${beverages.bevQuantity}, ${0})`, (err, results) => {
                 if (err) {
                   return connection.rollback(_ => {
                     res.status(500).send("error from beveragesOrders");
@@ -173,8 +220,8 @@ router.post("/", (req, res) => {
             });
 
             createOrder.dessert.map(desserts => {
-              connection.query(`INSERT INTO dessertsOrders (idDesserts, idOrders, dessQuantity) VALUES ` + 
-              `(${desserts.idDesserts}, ${orderId}, ${desserts.dessQuantity})`, (err, results) => {
+              connection.query(`INSERT INTO dessertsOrders (idDesserts, idOrders, dessQuantity, isMenuDess) VALUES ` + 
+              `(${desserts.idDesserts}, ${orderId}, ${desserts.dessQuantity}, ${0})`, (err, results) => {
                 if (err) {
                   return connection.rollback(_ => {
                     res.status(500).send("error from dessertsOrders");
@@ -185,6 +232,37 @@ router.post("/", (req, res) => {
             });
 
             createOrder.menuPizza.map(menuPizzas => {
+              // Update pizzasOrders to know if pizza is in menu or not
+              connection.query(`INSERT INTO pizzasOrders (idPizzas, idOrders, pizzasQuantity, isMenuPizz) VALUES ` +
+              `(${menuPizzas.pizza.idPizzas}, ${orderId}, ${1}, ${1})`, (err, results) => {
+                if (err) {
+                  return connection.rollback(_ => {
+                    res.status(500).send("error from menu, update pizzasOrders");
+                    throw err;
+                  })
+                }
+              })
+              // Update beveragesOrders to know if beverage is in menu or not
+              connection.query(`INSERT INTO beveragesOrders (idBeverages, idOrders, bevQuantity, isMenuBev) VALUES ` +
+              `(${menuPizzas.beverage.idBeverages}, ${orderId}, ${1}, ${1})`, (err, results) => {
+                if (err) {
+                  return connection.rollback(_ => {
+                    res.status(500).send("error from menu, update beveragesOrders");
+                    throw err;
+                  })
+                }
+              })
+              // Update dessertsOrders to know if dessert is in menu or not
+              connection.query(`INSERT INTO dessertsOrders (idDesserts, idOrders, dessQuantity, isMenuDess) VALUES ` +
+              `(${menuPizzas.dessert.idDesserts}, ${orderId}, ${1}, ${1})`, (err, results) => {
+                if (err) {
+                  return connection.rollback(_ => {
+                    res.status(500).send("error from menu, update dessertsOrders");
+                    throw err;
+                  })
+                }
+              })
+
               connection.query(`INSERT INTO menu (idPizzas, idOrders, idBeverages, idDesserts, menuPizzPrice, menuQuantity) VALUES ` +
               `(${menuPizzas.pizza.idPizzas}, ${orderId}, ${menuPizzas.beverage.idBeverages}, ${menuPizzas.dessert.idDesserts}, ${menuPizzas.menuPizzPriceTotal}, ${menuPizzas.menuPizzQuantity})`, (err, results) => {
                 if (err) {
