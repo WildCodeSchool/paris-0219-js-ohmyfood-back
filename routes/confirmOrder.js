@@ -142,8 +142,8 @@ router.post("/", (req, res) => {
 
             // POST pizzasOrders TABLE
             createOrder.pizza.map(pizz => {
-              connection.query(`INSERT INTO pizzasOrders (idOrders, pizzasQuantity, idPizzas, isMenuPizz) VALUES ` + 
-            `(${orderId}, ${pizz.pizzQuantity}, ${pizz.idPizzas}, ${0})`, (err, results) => {
+              connection.query(`INSERT INTO pizzasOrders (idOrders, pizzasQuantity, idPizzas) VALUES ` + 
+            `(${orderId}, ${pizz.pizzQuantity}, ${pizz.idPizzas})`, (err, results) => {
               if (err) {
                 return connection.rollback(_ => {
                   res.status(500).send("error from pizzasOrder");
@@ -208,8 +208,8 @@ router.post("/", (req, res) => {
             });
 
             createOrder.beverage.map(beverages => {
-              connection.query(`INSERT INTO beveragesOrders (idOrders, idBeverages, bevQuantity, isMenuBev) VALUES ` + 
-              `(${orderId}, ${beverages.idBeverages}, ${beverages.bevQuantity}, ${0})`, (err, results) => {
+              connection.query(`INSERT INTO beveragesOrders (idOrders, idBeverages, bevQuantity) VALUES ` + 
+              `(${orderId}, ${beverages.idBeverages}, ${beverages.bevQuantity})`, (err, results) => {
                 if (err) {
                   return connection.rollback(_ => {
                     res.status(500).send("error from beveragesOrders");
@@ -220,8 +220,8 @@ router.post("/", (req, res) => {
             });
 
             createOrder.dessert.map(desserts => {
-              connection.query(`INSERT INTO dessertsOrders (idDesserts, idOrders, dessQuantity, isMenuDess) VALUES ` + 
-              `(${desserts.idDesserts}, ${orderId}, ${desserts.dessQuantity}, ${0})`, (err, results) => {
+              connection.query(`INSERT INTO dessertsOrders (idDesserts, idOrders, dessQuantity) VALUES ` + 
+              `(${desserts.idDesserts}, ${orderId}, ${desserts.dessQuantity})`, (err, results) => {
                 if (err) {
                   return connection.rollback(_ => {
                     res.status(500).send("error from dessertsOrders");
@@ -264,7 +264,8 @@ router.post("/", (req, res) => {
               })
 
               connection.query(`INSERT INTO menu (idPizzas, idOrders, idBeverages, idDesserts, menuPizzPrice, menuQuantity) VALUES ` +
-              `(${menuPizzas.pizza.idPizzas}, ${orderId}, ${menuPizzas.beverage.idBeverages}, ${menuPizzas.dessert.idDesserts}, ${menuPizzas.menuPizzPriceTotal}, ${menuPizzas.menuPizzQuantity})`, (err, results) => {
+              `(${menuPizzas.pizza.idPizzas}, ${orderId}, ${menuPizzas.beverage.idBeverages}, ${menuPizzas.dessert.idDesserts}, ` +
+              `${menuPizzas.menuPizzPriceTotal}, ${menuPizzas.menuPizzQuantity})`, (err, results) => {
                 if (err) {
                   return connection.rollback(_ => {
                     res.status(500).send("Error from menu, pizza");
@@ -325,7 +326,8 @@ router.post("/", (req, res) => {
                       });
               
                     connection.query(`INSERT INTO menu (idOrders, idBeverages, idDesserts, idSaladsComposed, menuSaladPrice, menuQuantity) VALUES ` +
-                    `(${orderId}, ${menuSalads.beverage.idBeverages}, ${menuSalads.dessert.idDesserts}, ${saladComposedId}, ${+menuSalads.menuSaladPriceTotal}, ${menuSalads.menuSaladQuantity})`, (err, results) => {
+                    `(${orderId}, ${menuSalads.beverage.idBeverages}, ${menuSalads.dessert.idDesserts}, ${saladComposedId}, ` +
+                    `${+menuSalads.menuSaladPriceTotal}, ${menuSalads.menuSaladQuantity})`, (err, results) => {
                       if (err) {
                         return connection.rollback(_ => {
                           res.status(500).send("Error from menu, salad");
