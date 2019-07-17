@@ -2,9 +2,12 @@ const express = require("express");
 const router = express.Router();
 const connection = require("../conf");
 const getMenuPizz =  require("../getDataOrders/getMenuPizz");
+const getOrdersId = require("../getDataOrders/getOrdersId")
 
 router.get("/", (req, res) => {
   const detailOrderList = [];
+
+  getOrdersId.ordersTableData().then(res => console.log(res))
   
   connection.query('SELECT users.idUsers, firstname, lastname, mail, phoneNumber, ' +
   'idOrders, dateOrder, orderPrice, userMessage FROM users JOIN orders ON orders.idUsers = users.idUsers', (err, results) => {
@@ -71,7 +74,6 @@ router.get("/", (req, res) => {
             getMenuPizz.detailPizzaMenu(idMenuPizz)
             .then(detailMenuPizz => {
               detailOrderList.push(detailMenuPizz)
-              console.log(detailOrderList)
             });
           });
           
