@@ -1,10 +1,11 @@
 const express = require("express");
 const router = express.Router();
 const connection = require("../conf");
+const getMenuPizz =  require("../getDataOrders/getMenuPizz");
 
 router.get("/", (req, res) => {
   const detailOrderList = [];
-
+  
   connection.query('SELECT users.idUsers, firstname, lastname, mail, phoneNumber, ' +
   'idOrders, dateOrder, orderPrice, userMessage FROM users JOIN orders ON orders.idUsers = users.idUsers', (err, results) => {
     if (err) {
@@ -23,7 +24,8 @@ router.get("/", (req, res) => {
           //pizzas
           connection.query(`SELECT pizzName, pizzasQuantity FROM pizzasOrders ` + 
           `JOIN pizzas ON pizzas.idPizzas = pizzasOrders.idPizzas ` + 
-          `JOIN orders ON orders.idOrders = pizzasOrders.idOrders`, (err, results) => {
+          `JOIN orders ON orders.idOrders = pizzasOrders.idOrders ` +
+          `WHERE isMenuPizz IS NULL`, (err, results) => {
             if (err) {
               res.status(500).send("Erreur lors de la récupération des pizzas");
             } else {
@@ -33,7 +35,8 @@ router.get("/", (req, res) => {
           //beverages
           connection.query(`SELECT bevName, bevQuantity FROM beveragesOrders ` + 
           `JOIN beverages ON beverages.idBeverages = beveragesOrders.idBeverages ` + 
-          `JOIN orders ON orders.idOrders = beveragesOrders.idOrders`, (err, results) => {
+          `JOIN orders ON orders.idOrders = beveragesOrders.idOrders ` +
+          `WHERE isMenuBev IS NULL`, (err, results) => {
             if (err) {
               res.status(500).send("Erreur lors de la récupération des boissons");
             } else {
@@ -43,7 +46,8 @@ router.get("/", (req, res) => {
           // desserts
           connection.query(`SELECT dessName, dessQuantity FROM dessertsOrders ` + 
           `JOIN desserts ON desserts.idDesserts = dessertsOrders.idDesserts ` + 
-          `JOIN orders ON orders.idOrders = dessertsOrders.idOrders`, (err, results) => {
+          `JOIN orders ON orders.idOrders = dessertsOrders.idOrders ` +
+          `WHERE isMenuDess IS NULL`, (err, results) => {
             if (err) {
               res.status(500).send("Erreur lors de la récupération des desserts");
             } else {
@@ -62,50 +66,21 @@ router.get("/", (req, res) => {
           });
           
           // menu pizza
-          connection.query(`SELECT idOrders, idPizzas, idBeverages, idDesserts, menuPizzPrice, menuQuantity FROM menu ` + 
-          `WHERE menu.idOrders = ${orderId} AND idPizzas IS NOT NULL`, (err, results) => {
-            if (err) {
-              res.status(500).send("Erreur lors de la récupération des menus pizza");
-            } else {
-                results.map(menuPizza => {
-                  connection.query(`SELECT isMenuPizz, isMenuBev, isMenuDess FROM orders ` + 
-                  `JOIN pizzasOrders ON pizzasOrders.idPizzas = ${orderId} ` +
-                  `JOIN beveragesOrders ON beveragesOrders.idBeverages = ${orderId} ` +
-                  `JOIN dessertsOrders ON dessertsOrders.idDesserts = ${orderId}`, (err, results) => {
-                    if (err) {
-                      res.status(500).send("Erreur lors de la récupération du booléen permettant de savoir s'il s'agit d'un menu ou non.")
-                    } else {
-                      const isMenuPizz = results[0].isMenuPizz;
-                      const isMenuBev = results[0].isMenuBev;
-                      const isMenuDess = results[0].isMenuDess;
-                      console.log(isMenuPizz, isMenuBev, isMenuDess);
-                      
-                      connection.query(`SELECT pizzName, bevName, dessName FROM menu ` +
-                      `JOIN pizzas ON pizzas.idPizzas = ${menuPizza.idPizzas} ` + 
-                      `JOIN beverages ON beverages.idBeverages = ${menuPizza.idBeverages} ` +
-                      `JOIN desserts ON desserts.idDesserts = ${menuPizza.idDesserts} ` +
-                      `JOIN pizzasOrders ON pizzasOrders.idPizzas = ${menuPizza.idPizzas} `
-                      `WHERE menu.idOrders = ${orderId} ` + 
-                      `AND ${isMenuPizz} IS NOT NULL AND ${isMenuBev} IS NOT NULL AND ${isMenuDess} IS NOT NULL`, (err, results) => {
-                        if (err) {
-                          res.status(500).send("Erreur lors de la récupération du détail des menus pizzas")
-                        } else {
-                        console.log(results);
-                        }
-                    })
-                    }
-                  })
-
-                })
-                
-              
-            }
-          } 
-        )};
+          getMenuPizz.menuPizzasData(orderId)
+          .then(idMenuPizz => {
+            getMenuPizz.detailPizzaMenu(idMenuPizz)
+            .then(detailMenuPizz => {
+              detailOrderList.push(detailMenuPizz)
+              console.log(detailOrderList)
+            });
+          });
+          
+        };
         res.status(200).send(detailOrderList);
       });
     };
-  });
+  })
+    
 });
 
 router.post("/", (req, res) => {
