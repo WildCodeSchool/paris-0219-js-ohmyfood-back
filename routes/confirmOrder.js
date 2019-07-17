@@ -4,81 +4,72 @@ const connection = require("../conf");
 const getMenuPizz =  require("../getDataOrders/getMenuPizz");
 const getOrdersId = require("../getDataOrders/getOrdersId");
 const getUserAddress = require("../getDataOrders/getUserAddress");
+const getPizzas = require("../getDataOrders/getPizzas");
 
 router.get("/", (req, res) => {
   const detailOrderList = [];
 
+  // Starting getting informations
+  // First from ordersTable
   getOrdersId.ordersTableData()
   .then(ordersInfo => {
-    detailOrderList.push(ordersInfo[0]);
-    const orderId = ordersInfo[0].idOrders;
-    const userId = ordersInfo[0].idUsers;
+    detailOrderList.push(ordersInfo[0]); // Push results in final response which is an array
+    const orderId = ordersInfo[0].idOrders; // Get orderId for later
+    const userId = ordersInfo[0].idUsers; // Get userId for later
 
+    // Get userAddress informations
     getUserAddress.userAddressTableData(userId)
     .then(userAddressInfos => {
-      detailOrderList.push(userAddressInfos)
-      console.log('detailOrderList ', detailOrderList);
-    })
+      detailOrderList.push(userAddressInfos) // Push results in final response
 
-  })
+      getPizzas.getPizzasDetails()
+      .then(pizzasDetails => {
+        detailOrderList.push(pizzasDetails);
+        console.log('detailOrderList ', detailOrderList);
 
-          //pizzas
-          connection.query(`SELECT pizzName, pizzasQuantity FROM pizzasOrders ` + 
-          `JOIN pizzas ON pizzas.idPizzas = pizzasOrders.idPizzas ` + 
-          `JOIN orders ON orders.idOrders = pizzasOrders.idOrders ` +
-          `WHERE isMenuPizz IS NULL`, (err, results) => {
-            if (err) {
-              res.status(500).send("Erreur lors de la récupération des pizzas");
-            } else {
-              detailOrderList.push(results);
-            }
+        /* getMenuPizz.menuPizzasData(orderId)
+        .then(idMenuPizz => {
+          getMenuPizz.detailPizzaMenu(idMenuPizz)
+          .then(detailMenuPizz => {
+            detailOrderList.push(detailMenuPizz) */
           });
-          //beverages
-          connection.query(`SELECT bevName, bevQuantity FROM beveragesOrders ` + 
-          `JOIN beverages ON beverages.idBeverages = beveragesOrders.idBeverages ` + 
-          `JOIN orders ON orders.idOrders = beveragesOrders.idOrders ` +
-          `WHERE isMenuBev IS NULL`, (err, results) => {
-            if (err) {
-              res.status(500).send("Erreur lors de la récupération des boissons");
-            } else {
-              detailOrderList.push(results);
-            }
-          });
-          // desserts
-          connection.query(`SELECT dessName, dessQuantity FROM dessertsOrders ` + 
-          `JOIN desserts ON desserts.idDesserts = dessertsOrders.idDesserts ` + 
-          `JOIN orders ON orders.idOrders = dessertsOrders.idOrders ` +
-          `WHERE isMenuDess IS NULL`, (err, results) => {
-            if (err) {
-              res.status(500).send("Erreur lors de la récupération des desserts");
-            } else {
-              detailOrderList.push(results);
-            };
-          });
-          
-          // salads
-          connection.query(`SELECT saladsComposed.idSaladsSauces, saladsComposed.idSaladsComposed, saladsComposedQuantity, saladsComposedPrice ` + 
-          `FROM saladsComposed`, (err, results) => {
-            if (err) {
-              res.status(500).send("Erreur lors de la récupération des salades composées");
-            } else {
-              detailOrderList.push(results);
-            };
-          });
-          
-          // menu pizza
-          getMenuPizz.menuPizzasData(orderId)
-          .then(idMenuPizz => {
-            getMenuPizz.detailPizzaMenu(idMenuPizz)
-            .then(detailMenuPizz => {
-              detailOrderList.push(detailMenuPizz)
-            });
-          });
-          
-        
-        res.status(200).send(detailOrderList);
+        });
+      });
+      //beverages
+      connection.query(`SELECT bevName, bevQuantity FROM beveragesOrders ` + 
+      `JOIN beverages ON beverages.idBeverages = beveragesOrders.idBeverages ` + 
+      `JOIN orders ON orders.idOrders = beveragesOrders.idOrders ` +
+      `WHERE isMenuBev IS NULL`, (err, results) => {
+        if (err) {
+          res.status(500).send("Erreur lors de la récupération des boissons");
+        } else {
+          detailOrderList.push(results);
+        }
+      });
+      // desserts
+      connection.query(`SELECT dessName, dessQuantity FROM dessertsOrders ` + 
+      `JOIN desserts ON desserts.idDesserts = dessertsOrders.idDesserts ` + 
+      `JOIN orders ON orders.idOrders = dessertsOrders.idOrders ` +
+      `WHERE isMenuDess IS NULL`, (err, results) => {
+        if (err) {
+          res.status(500).send("Erreur lors de la récupération des desserts");
+        } else {
+          detailOrderList.push(results);
+        };
+      });
       
-});
+      // salads
+      connection.query(`SELECT saladsComposed.idSaladsSauces, saladsComposed.idSaladsComposed, saladsComposedQuantity, saladsComposedPrice ` + 
+      `FROM saladsComposed`, (err, results) => {
+        if (err) {
+          res.status(500).send("Erreur lors de la récupération des salades composées");
+        } else {
+          detailOrderList.push(results);
+        };
+      });        
+    res.status(200).send(detailOrderList);
+    });
+      
 
 router.post("/", (req, res) => {
   const createOrder = req.body[0];
