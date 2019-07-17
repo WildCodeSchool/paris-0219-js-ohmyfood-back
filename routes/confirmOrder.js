@@ -2,27 +2,25 @@ const express = require("express");
 const router = express.Router();
 const connection = require("../conf");
 const getMenuPizz =  require("../getDataOrders/getMenuPizz");
-const getOrdersId = require("../getDataOrders/getOrdersId")
+const getOrdersId = require("../getDataOrders/getOrdersId");
+const getUserAddress = require("../getDataOrders/getUserAddress");
 
 router.get("/", (req, res) => {
   const detailOrderList = [];
 
-  getOrdersId.ordersTableData().then(res => console.log(res))
-  
-  connection.query('SELECT users.idUsers, firstname, lastname, mail, phoneNumber, ' +
-  'idOrders, dateOrder, orderPrice, userMessage FROM users JOIN orders ON orders.idUsers = users.idUsers', (err, results) => {
-    if (err) {
-      res.status(500).send("Erreur lors de la récupération de la commande");
-    } else {
-      detailOrderList.push(results[0]);
-      const orderId = results[0].idOrders;
-      const userId = results[0].idUsers;
-      connection.query(`SELECT userAddress1, userAddress2, zipcode, city, userFacturation, userAddressFacturation FROM userAddress ` +
-       `WHERE idUsers = ${userId}`, (err, results) => {
-        if (err) {
-          res.status(500).send("Erreur lors de la récupération des adresses");
-        } else {
-          detailOrderList.push(results[0]);
+  getOrdersId.ordersTableData()
+  .then(ordersInfo => {
+    detailOrderList.push(ordersInfo[0]);
+    const orderId = ordersInfo[0].idOrders;
+    const userId = ordersInfo[0].idUsers;
+
+    getUserAddress.userAddressTableData(userId)
+    .then(userAddressInfos => {
+      detailOrderList.push(userAddressInfos)
+      console.log('detailOrderList ', detailOrderList);
+    })
+
+  })
 
           //pizzas
           connection.query(`SELECT pizzName, pizzasQuantity FROM pizzasOrders ` + 
@@ -77,12 +75,9 @@ router.get("/", (req, res) => {
             });
           });
           
-        };
+        
         res.status(200).send(detailOrderList);
-      });
-    };
-  })
-    
+      
 });
 
 router.post("/", (req, res) => {
