@@ -13,8 +13,8 @@ let transporter = nodemailer.createTransport({
   service:'gmail',
   secure: false,
   auth: {
-      user: "*********",
-      pass: "*********"
+      user: "forbidden.soul81@gmail.com",
+      pass: "dblI125ok*/gitmyfriend"
   }, 
   debug: false,
   logger: true
@@ -42,7 +42,11 @@ router.post("/", (req, res) => {
             res.send('error ', err);
           } else {
             console.log("user recognized");
-            const token = jwt.sign(userData, jwtSecret, (err, token) => {
+            payload = {
+              "mail": userMail,
+              "password": userData.password,
+            }
+            const token = jwt.sign(payload, jwtSecret, (err, token) => {
                 res.json({
                   token,
                   'userMail': results['0'].mail,
@@ -80,11 +84,9 @@ router.post("/protected", (req, res, next) => {
 });
 
 router.post("/forgottenPassword", (req, res) => {
-  console.log(req.body)
   const userMail = req.body.userMail;
-  const token = req.body.token;
 
-  connection.query(`SELECT mail FROM users WHERE mail = '${userMail}'`, (err, results) => {
+  connection.query(`SELECT mail, forgotPassword FROM users WHERE mail = '${userMail}'`, (err, results) => {
     if (err) {
       console.log(err);
       res.status(500).send("Erreur lors de la vérification de l'email");
@@ -94,7 +96,7 @@ router.post("/forgottenPassword", (req, res) => {
         to: userMail, // Destinataires
         subject: "Récupération de votre mot de passe", // Sujet
         text: `Ce mail vous est destiné dans le cas où vous avez fait une demande de nouveau mot de passe. Cliquez sur le lien suivant pour continuer la procédure : 
-        http://localhost:3000/${token}
+        http://localhost:4200/newPassword/${results[0].forgotPassword}
           Dans le cas où vous n'avez pas fait cette demande, contactez l'équipe d'OhMyFood pour que ceux-ci puissent résoudre le problème le plus rapidement possible.
         `, // plaintext body
       }, (error, response) => {
@@ -104,6 +106,17 @@ router.post("/forgottenPassword", (req, res) => {
               console.log("Message sent: " + response.message);
           }
       });
+    }
+  });
+});
+
+router.post("/newPassword", (req, res) => {
+  const userToken = req.body.token
+  connection.query(`SELECT forgotPassword FROM users WHERE forgotPassword = '${userToken}'`, (err, results) => {
+    if (err) {
+      res.status(500).send("Le token ne correspond pas")
+    } else {
+      res.status(200)
     }
   });
 });
