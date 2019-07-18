@@ -147,10 +147,8 @@ router.put("/Lm18yduHpcacijU0y2Mi", (req, res) => {
           const token = jwt.sign(payload, jwtSecret, (err, token) => {
             connection.query(`UPDATE users SET password = '${password}', forgotPassword = '${token}' WHERE forgotPassword = '${forgotPassword}'`, (err, results) => {
               if (err) {
-                console.log(results)
                 res.status(500).send("L'insertion du mot de passe a échouée")
               } else {
-                console.log(results)
                 res.json({'response': 'done'})
                 res.status(200)
               }
