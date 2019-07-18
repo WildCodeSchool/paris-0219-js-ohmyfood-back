@@ -13,8 +13,8 @@ let transporter = nodemailer.createTransport({
   service:'gmail',
   secure: false,
   auth: {
-    user: "*********",
-    pass: "********"
+    user: "*****",
+    pass: "*****"
   }, 
   debug: false,
   logger: true
@@ -33,7 +33,6 @@ router.get("/", (req, res) => {
 router.post("/", (req, res) => {
 
   const userData = req.body['0'];
-  console.log(userData)
   const userMail = req.body['0'].mail
   const userDataAddress = req.body['1'];
 

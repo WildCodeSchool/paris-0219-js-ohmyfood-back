@@ -13,8 +13,8 @@ let transporter = nodemailer.createTransport({
   service:'gmail',
   secure: false,
   auth: {
-      user: "********",
-      pass: "*********"
+      user: "******",
+      pass: "******"
   }, 
   debug: false,
   logger: true
@@ -112,15 +112,54 @@ router.post("/forgottenPassword", (req, res) => {
 
 router.post("/TzApeyaNpBzRJmGrit59K4NJ5Cy", (req, res) => {
   const userToken = req.body.token
+  console.log('userToken', userToken)
   connection.query(`SELECT forgotPassword FROM users WHERE forgotPassword = '${userToken}'`, (err, results) => {
     if (err) {
       res.status(500).send("Le token ne correspond pas")
     } else if (results.length == 0){
-      res.status(401).send("Le token ne correspond pas")
+      res.json({token: `${results}`})
+      res.status(200)
     } else { 
       res.json({token: `${userToken}`})
       res.status(200)
     }
+  });
+});
+
+router.put("/Lm18yduHpcacijU0y2Mi", (req, res) => {
+  password = req.body.password
+  forgotPassword = req.body.forgotPassword
+  bcrypt.hash(password, 10, (err, hash) => {
+    password = hash; // Hash user password
+    connection.query(`SELECT forgotPassword FROM users WHERE forgotPassword = '${forgotPassword}'`, (err, results) => {
+      if (err) {
+        res.status(500).send("Le token ne correspond pas")
+      } else {
+        jwt.verify(forgotPassword, jwtSecret, (err, decoded) => {
+          if(err) {
+            console.log(err);
+            return res.status(401).send({mess: "Vous n'avez pas accès aux données"});
+          }
+          payload = {
+            "mail": decoded.mail,
+            "password": password,
+          }
+          const token = jwt.sign(payload, jwtSecret, (err, token) => {
+            connection.query(`UPDATE users SET password = '${password}', forgotPassword = '${token}' WHERE forgotPassword = '${forgotPassword}'`, (err, results) => {
+              if (err) {
+                console.log(results)
+                res.status(500).send("L'insertion du mot de passe a échouée")
+              } else {
+                console.log(results)
+                res.json({'response': 'done'})
+                res.status(200)
+              }
+            });
+          });
+          
+        })
+      }
+  });
   });
 });
 
