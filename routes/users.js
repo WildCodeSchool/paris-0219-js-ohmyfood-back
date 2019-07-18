@@ -13,8 +13,8 @@ let transporter = nodemailer.createTransport({
   service:'gmail',
   secure: false,
   auth: {
-    user: "forbidden.soul81@gmail.com",
-    pass: "dblI125ok*/gitmyfriend"
+    user: "*********",
+    pass: "********"
   }, 
   debug: false,
   logger: true
