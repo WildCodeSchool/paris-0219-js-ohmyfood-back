@@ -1,24 +1,16 @@
 const connection = require("../conf");
 
-const sqlRequestDessertsOrders = (orderId) =>
-    `SELECT dessName, dessQuantity FROM dessertsOrders ` + 
+const sqlRequestDessertsOrders = () =>
+    `SELECT orders.idOrders, dessName, dessQuantity FROM dessertsOrders ` + 
     `JOIN desserts ON desserts.idDesserts = dessertsOrders.idDesserts ` +
-    `WHERE idOrders = ${orderId} AND isMenuDess IS NULL`;
+    `JOIN orders ON orders.idOrders = dessertsOrders.idOrders ` +
+    `WHERE isMenuDess IS NULL`;
 
-const getDessertsDetails = (ordersInfos) => {
+const getDessertsDetails = () => {
     return new Promise((resolve, reject) => {
-        // Array to get final result
-        const result = [];
-
-        // Map to get all infos of according to orders
-        ordersInfos.map((orderInfo, i) => {
-            connection.query(sqlRequestDessertsOrders(orderInfo.idOrders), (err, results) => {
-                if (err) reject([err, "Error from dessertsOrders"]);
-                result.push(results)
-                if (i + 1 === ordersInfos.length) {
-                    resolve(result);
-                };
-            });
+        connection.query(sqlRequestDessertsOrders(), (err, results) => {
+            if (err) reject([err, "Error from dessertsOrders"]);  
+            resolve(results);
         });
     });
 };    
