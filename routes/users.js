@@ -3,6 +3,9 @@ const router = express.Router();
 const connection = require("../conf");
 const nodemailer = require("nodemailer");
 const bcrypt = require("bcrypt");
+const jwt = require("jsonwebtoken");
+const jwtSecret = require("../jwtSecret");
+
 // Création de la méthode de transport de l'email 
 let transporter = nodemailer.createTransport({
   host: 'smtp.mail.gmail.com',
@@ -10,8 +13,8 @@ let transporter = nodemailer.createTransport({
   service:'gmail',
   secure: false,
   auth: {
-      user: "*******",
-      pass: "******"
+    user: "*****",
+    pass: "*****"
   }, 
   debug: false,
   logger: true
@@ -48,38 +51,44 @@ router.post("/", (req, res) => {
         if (err) {
           res.send('error ', err)
         }
-
-        connection.query('INSERT INTO users SET ?', [userData], (err, results) => {
-          if (err) {
-            console.log(err);
-            res.status(500).send("Erreur lors de la création de l'utilisateur");
-          }
-          else {
-            connection.query(`SELECT idUsers FROM users WHERE mail = '${userMail}'`, (err, results) => {
-              userDataAddress.idUsers = results['0'].idUsers;
-              connection.query('INSERT INTO userAdress SET ?', [userDataAddress], (err, results) => {
-                if (err) {
-                  console.log(err);
-                  res.status(500).send("Erreur lors de la création de l'utilisateur");
-                }
-                else {
-                  transporter.sendMail({
-                    from: "OhMyFood", // Expediteur
-                    to: userMail, // Destinataires
-                    subject: "Création de votre compte", // Sujet
-                    text: `Merci d'avoir créé un compte chez OhMyFood, vous pourrez désormais accéder au service de commande en ligne de l'application avec votre adresse mail ${userMail}`, // plaintext body
-                  }, (error, response) => {
-                      if(error){
-                          console.log(error);
-                      }else{
-                          console.log("Message sent: " + response.message);
-                      }
-                  });
-                  res.sendStatus(200)
-                } 
+        payload = {
+          "mail": userMail,
+          "password": userData.password,
+        }
+        const token = jwt.sign(payload, jwtSecret, (err, token) => {
+          userData.forgotPassword = token;
+          connection.query('INSERT INTO users SET ?', userData, (err, results) => {
+            if (err) {
+              console.log(err);
+              res.status(500).send("Erreur lors de la création de l'utilisateur");
+            }
+            else {
+              connection.query(`SELECT idUsers FROM users WHERE mail = '${userMail}'`, (err, results) => {
+                userDataAddress.idUsers = results['0'].idUsers;
+                connection.query('INSERT INTO userAddress SET ?', [userDataAddress], (err, results) => {
+                  if (err) {
+                    console.log(err);
+                    res.status(500).send("Erreur lors de la création de l'utilisateur");
+                  }
+                  else {
+                    transporter.sendMail({
+                      from: "OhMyFood", // Expediteur
+                      to: userMail, // Destinataires
+                      subject: "Création de votre compte", // Sujet
+                      text: `Merci d'avoir créé un compte chez OhMyFood, vous pourrez désormais accéder au service de commande en ligne de l'application avec votre adresse mail ${userMail}`, // plaintext body
+                    }, (error, response) => {
+                        if(error){
+                            console.log(error);
+                        }else{
+                            console.log("Message sent: " + response.message);
+                        }
+                    });
+                    res.sendStatus(200)
+                  } 
+                });
               });
-            });
-          } 
+            } 
+          });
         });
       })
     } 
@@ -96,8 +105,7 @@ router.post("/account", (req, res, next) => {
       return res.status(401).send({mess: "Vous n'avez pas accès aux données"});
     }
     userId = results['0'].idUsers
-    console.log('result', results)
-    connection.query(`SELECT * FROM userAdress WHERE idUsers = '${userId}'`, (err, resultsAdress) => {
+    connection.query(`SELECT * FROM userAddress WHERE idUsers = '${userId}'`, (err, resultsAdress) => {
       if(err) {
         console.log(err);
         return res.status(401).send({mess: "Vous n'avez pas accès aux données"});
