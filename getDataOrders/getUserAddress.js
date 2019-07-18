@@ -8,7 +8,10 @@ const sqlRequestUserAddress = userId =>
 
 const userAddressTableData = orderInfo => {
     return new Promise((resolve, reject) => {
+        // Get final result in this array
         const result = [];
+
+        // Map to get all infos according to orders
         orderInfo.map((ordersInfos, i) => {
             connection.query(sqlRequestUserAddress(ordersInfos.idUsers), (err, results) => {
                 if (err) reject([err, 'userAddressTable']);
