@@ -13,15 +13,14 @@ let transporter = nodemailer.createTransport({
   service:'gmail',
   secure: false,
   auth: {
-      user: "******",
-      pass: "******"
+      user: "*******",
+      pass: "*******"
   }, 
   debug: false,
   logger: true
 });
 
 router.post("/", (req, res) => {
-  const userData = req.body;
   const userPssw = req.body.password;
   const userMail = req.body.mail;
 
@@ -44,7 +43,7 @@ router.post("/", (req, res) => {
             console.log("user recognized");
             payload = {
               "mail": userMail,
-              "password": userData.password,
+              "password": results['0'].password,
             }
             const token = jwt.sign(payload, jwtSecret, (err, token) => {
                 res.json({
@@ -147,8 +146,10 @@ router.put("/Lm18yduHpcacijU0y2Mi", (req, res) => {
           const token = jwt.sign(payload, jwtSecret, (err, token) => {
             connection.query(`UPDATE users SET password = '${password}', forgotPassword = '${token}' WHERE forgotPassword = '${forgotPassword}'`, (err, results) => {
               if (err) {
+                console.log(results)
                 res.status(500).send("L'insertion du mot de passe a échouée")
               } else {
+                console.log(results)
                 res.json({'response': 'done'})
                 res.status(200)
               }
