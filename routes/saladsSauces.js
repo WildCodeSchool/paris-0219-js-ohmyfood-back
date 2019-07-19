@@ -25,10 +25,18 @@ router.post('/', (req, res) => {
 });
 
 router.put('/', (req, res) => {
-  const id = req.body.idSaladsSauces;
+  nameSauce = '';
+  console.log(req.body)
+
+  if (req.body.saladsSaucesName.indexOf('|') != -1) {
+    nameSauce = req.body.saladsSaucesName.split('|')[0];
+    req.body.saladsSaucesName = req.body.saladsSaucesName.split('|')[1];
+  } else {
+    nameSauce = req.body.saladsSaucesName;
+  }
   const updateSaladSauces = req.body;
 
-  connection.query('UPDATE saladsSauces SET ? WHERE idSaladsSauces = ? ', [updateSaladSauces, id], (err, results)  => {
+  connection.query('UPDATE saladsSauces SET ? WHERE saladsSaucesName = ? ', [updateSaladSauces, nameSauce], (err, results)  => {
     if (err) {
       res.status(500).send('Erreur lors de la mise à jour de la sauce');
     } else {
@@ -38,9 +46,10 @@ router.put('/', (req, res) => {
 });
 
 router.delete('/', (req, res) => {
-  const id = req.body.idSaladsSauces;
 
-  connection.query('DELETE FROM saladsSauces WHERE idSaladsSauces = ?', [id], (err, results)  => {
+  const name = req.query.saladsSaucesName
+
+  connection.query('DELETE FROM saladsSauces WHERE saladsSaucesName = ?', [name], (err, results)  => {
     if (err) {
       res.status(500).send('Erreur lors de la suppression de la sauce');
     } else {
