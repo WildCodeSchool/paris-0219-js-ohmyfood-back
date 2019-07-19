@@ -13,8 +13,8 @@ let transporter = nodemailer.createTransport({
   service:'gmail',
   secure: false,
   auth: {
-      user: "*******",
-      pass: "*******"
+      user: "******",
+      pass: "******"
   }, 
   debug: false,
   logger: true
@@ -100,9 +100,10 @@ router.post("/forgottenPassword", (req, res) => {
         `, // plaintext body
       }, (error, response) => {
           if(error){
-              console.log(error);
+            console.log(error);
           }else{
-              console.log("Message sent: " + response.message);
+            console.log("Message sent: " + response.message);
+            res.json({'responseNewPssw':'firstStep'})
           }
       });
     }
@@ -111,7 +112,6 @@ router.post("/forgottenPassword", (req, res) => {
 
 router.post("/TzApeyaNpBzRJmGrit59K4NJ5Cy", (req, res) => {
   const userToken = req.body.token
-  console.log('userToken', userToken)
   connection.query(`SELECT forgotPassword FROM users WHERE forgotPassword = '${userToken}'`, (err, results) => {
     if (err) {
       res.status(500).send("Le token ne correspond pas")
@@ -119,7 +119,7 @@ router.post("/TzApeyaNpBzRJmGrit59K4NJ5Cy", (req, res) => {
       res.json({token: `${results}`})
       res.status(200)
     } else { 
-      res.json({token: `${userToken}`})
+      res.json({token: `${userToken}`,response: 'firstStep'});
       res.status(200)
     }
   });
@@ -150,15 +150,13 @@ router.put("/Lm18yduHpcacijU0y2Mi", (req, res) => {
                 res.status(500).send("L'insertion du mot de passe a échouée")
               } else {
                 console.log(results)
-                res.json({'response': 'done'})
                 res.status(200)
               }
             });
           });
-          
-        })
+        });
       }
-  });
+    });
   });
 });
 
