@@ -26,10 +26,17 @@ router.post('/', (req, res) => {
 });
 
 router.put('/', (req, res) => {
-  const id = req.body.idSaladsIngredients;
+  nameIng = '';
+
+  if (req.body.saladsIngredientsName.indexOf('|') != -1) {
+    nameIng = req.body.saladsIngredientsName.split('|')[0];
+    req.body.saladsIngredientsName = req.body.saladsIngredientsName.split('|')[1];
+  }else{
+    nameIng = req.body.saladsIngredientsName;
+  }
   const updateSaladIng = req.body;
 
-  connection.query('UPDATE saladsIngredients SET ? WHERE idSaladsIngredients = ?', [updateSaladIng, id], (err, results) => {
+  connection.query('UPDATE saladsIngredients SET ? WHERE saladsIngredientsName = ?', [updateSaladIng, nameIng], (err, results) => {
     if (err) {
       res.status(500).send('Erreur lors de la mise à jour des ingrédients');
     } else {
@@ -39,9 +46,10 @@ router.put('/', (req, res) => {
 });
 
 router.delete('/', (req, res) => {
-  const id = req.body.idSaladsIngredients
 
-  connection.query('DELETE FROM saladsIngredients WHERE idSaladsIngredients = ?', [id], (err, results) => {
+  const name = req.query.saladsIngredientsName
+
+  connection.query('DELETE FROM saladsIngredients WHERE saladsIngredientsName = ?', [name], (err, results) => {
     if (err) {
       res.status(500).send("Erreur lors de la suppression de l'ingrédient");
     } else {
