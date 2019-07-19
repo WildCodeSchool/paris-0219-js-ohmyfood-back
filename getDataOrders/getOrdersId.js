@@ -3,7 +3,7 @@ const connection = require("../conf");
 // -----------------------------GET ID FROM ORDERS---------------------------
 
 const sqlRequestOrdersTable = () => 
-    'SELECT users.idUsers, firstname, lastname, mail, phoneNumber, ' +
+    'SELECT users.idUsers, firstname, lastname, mail, phoneNumber, deliveryAddress, ' +
     'idOrders, dateOrder, orderPrice, userMessage FROM users JOIN orders ON orders.idUsers = users.idUsers';
 
 const ordersTableData = () => {
