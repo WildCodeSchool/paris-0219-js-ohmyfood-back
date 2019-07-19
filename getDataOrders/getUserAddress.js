@@ -3,7 +3,7 @@ const connection = require("../conf");
 // ---------------------------------GET USER DETAIL ADRESS------------------------
 
 const sqlRequestUserAddress = () => 
-    `SELECT orders.idOrders, userAddress1, userAddress2, zipcode, city, userFacturation, userAddressFacturation FROM users ` +
+    `SELECT orders.idOrders, userAddress1, userAddress2, zipcode, city, userFacturation FROM users ` +
     `JOIN orders ON orders.idUsers = users.idUsers ` +
     `JOIN userAddress ON userAddress.idUsers = users.idUsers`;
 
