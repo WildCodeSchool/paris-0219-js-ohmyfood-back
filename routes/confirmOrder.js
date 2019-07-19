@@ -6,65 +6,65 @@ const getOrdersId = require("../getDataOrders/getOrdersId");
 const getUserAddress = require("../getDataOrders/getUserAddress");
 const getPizzas = require("../getDataOrders/getPizzas");
 const getBeverages = require("../getDataOrders/getBeverages");
+const getDesserts = require("../getDataOrders/getDesserts");
+const getSaladsComposed = require("../getDataOrders/getSaladsComposed");
+const getMenuSaladsComposed = require("../getDataOrders/getMenuSalads");
 
 router.get("/", (req, res) => {
   const detailOrderList = [];
-
+  
   // Starting getting informations
   // First from ordersTable
   getOrdersId.ordersTableData()
   .then(ordersInfo => {
     detailOrderList.push(ordersInfo); // Push results in final response which is an array
-
-
+    
     // Get userAddress informations
-    getUserAddress.userAddressTableData(ordersInfo)
+    getUserAddress.userAddressTableData()
     .then(userAddressInfos => {
       detailOrderList.push(userAddressInfos) // Push results in final response
-
+      
       // Get Pizzas details
       getPizzas.getPizzasDetails()
       .then(pizzasDetails => {
         detailOrderList.push(pizzasDetails); // Push results in final response
-
+    
         // Get Beverages details
         getBeverages.getBeveragesDetails()
         .then(beveragesDetails => {
           detailOrderList.push(beveragesDetails) // Push results in final response
-          console.log('detailOrderList ', detailOrderList);
-          /* getMenuPizz.menuPizzasData(orderId)
-          .then(idMenuPizz => {
-            getMenuPizz.detailPizzaMenu(idMenuPizz)
-            .then(detailMenuPizz => {
-              detailOrderList.push(detailMenuPizz) */
-        })
 
+          // Get Desserts details
+          getDesserts.getDessertsDetails()
+          .then(dessertsDetails => {
+            detailOrderList.push(dessertsDetails); // Push results in final response
+
+            // Get MenuPizz detail
+            getMenuPizz.getPizzaMenu()
+            .then(detailMenuPizz => {
+              detailOrderList.push(detailMenuPizz); // Push results in final response
+    
+              // Get saladsComposed detail
+              getSaladsComposed.getSaladsComposedDetails()
+              .then(saladsComposedDetails => {
+                detailOrderList.push(saladsComposedDetails) // Push results in final response
+
+                // Get menuSaladsComposed
+                getMenuSaladsComposed.getSaladsComposedMenu()
+                .then(menuSaladsComposedDetails => {
+                  detailOrderList.push(menuSaladsComposedDetails) // Push results in final response
+
+                  // Send final response to front
+                  res.json(detailOrderList) 
+                });
+              });
+            });
           });
         });
       });
-      // desserts
-      connection.query(`SELECT dessName, dessQuantity FROM dessertsOrders ` + 
-      `JOIN desserts ON desserts.idDesserts = dessertsOrders.idDesserts ` + 
-      `JOIN orders ON orders.idOrders = dessertsOrders.idOrders ` +
-      `WHERE isMenuDess IS NULL`, (err, results) => {
-        if (err) {
-          res.status(500).send("Erreur lors de la récupération des desserts");
-        } else {
-          detailOrderList.push(results);
-        };
-      });
-      
-      // salads
-      connection.query(`SELECT saladsComposed.idSaladsSauces, saladsComposed.idSaladsComposed, saladsComposedQuantity, saladsComposedPrice ` + 
-      `FROM saladsComposed`, (err, results) => {
-        if (err) {
-          res.status(500).send("Erreur lors de la récupération des salades composées");
-        } else {
-          detailOrderList.push(results);
-        };
-      });        
-    res.status(200).send(detailOrderList);
     });
+  });
+});        
       
 
 router.post("/", (req, res) => {
@@ -85,7 +85,7 @@ router.post("/", (req, res) => {
     if (err) {
       throw err
     }
-
+    
     // POST orders TABLE
     connection.query(`INSERT INTO orders (dateOrder, orderMessage, orderPrice, userMessage, idUsers, deliveryAddress, facturationAddress) VALUES ` + 
       `('${orderDate}', 'Merci d avoir commandé chez Ohmyfood', ${orderPrice}, '${userDetail.comment}', ${userDetail.idUsers}, ` + 
@@ -235,8 +235,9 @@ router.post("/", (req, res) => {
             });
             
             createOrder.menuSalad.map(menuSalads => {
-              connection.query(`INSERT INTO saladsComposed (saladsComposedPrice, idSaladsSauces, saladsComposedQuantity, idOrders) VALUES ` +
-              `(${+menuSalads.salad.orderSaladsPriceTotal}, ${menuSalads.salad.orderSaladsSauces.idSaladsSauces}, ${menuSalads.salad.orderSaladsQuantity}, ${orderId})`, (err, results) => {
+              connection.query(`INSERT INTO saladsComposed (saladsComposedPrice, idSaladsSauces, saladsComposedQuantity, idOrders, isMenuSalads) VALUES ` +
+              `(${+menuSalads.salad.orderSaladsPriceTotal}, ${menuSalads.salad.orderSaladsSauces.idSaladsSauces}, ` +
+              `${menuSalads.salad.orderSaladsQuantity}, ${orderId}, ${1})`, (err, results) => {
                 if (err) {
                   return connection.rollback(_ => {
                     res.status(500).send("error from saladsComposed");
