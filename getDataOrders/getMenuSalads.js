@@ -19,7 +19,7 @@ const sqlRequestDetailsMenuSaladsComposed = () =>
     `LEFT JOIN orders ON orders.idOrders = menu.idOrders ` +
     `WHERE isMenuSalads IS NOT NULL GROUP BY saladsComposed.idSaladsComposed`;
 
-const getDetailSaladsComposedMenu = () => {
+const getSaladsComposedMenu = () => {
     return new Promise((resolve, reject) => {
         connection.query(sqlRequestDetailsMenuSaladsComposed(), (err, results) => {
             if (err) reject([err, "Error from menu saladsComposed"]);
@@ -28,4 +28,4 @@ const getDetailSaladsComposedMenu = () => {
     });
 };
 
-module.exports = { getDetailSaladsComposedMenu };
+module.exports = { getSaladsComposedMenu };

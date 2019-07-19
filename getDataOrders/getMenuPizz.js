@@ -2,7 +2,7 @@ const connection = require("../conf");
 
 // ------------------------------------------GET DETAIL MENU------------------
 
-const sqlRequestDetailsMenu = () => 
+const sqlRequestDetailsMenuPizz = () => 
     `SELECT orders.idOrders, pizzName, bevName, dessName, menuQuantity, menuPizzPrice FROM menu `+
     `JOIN pizzas ON pizzas.idPizzas = menu.idPizzas ` +
     `JOIN beverages ON beverages.idBeverages = menu.idBeverages ` +
@@ -10,14 +10,13 @@ const sqlRequestDetailsMenu = () =>
     `JOIN orders ON orders.idOrders = menu.idOrders ` +
     `WHERE menu.idPizzas IS NOT NULL`;
 
-const detailPizzaMenu = () => {
+const getPizzaMenu = () => {
     return new Promise((resolve, reject) => {
-        connection.query(sqlRequestDetailsMenu(), (err, results) => {
-            if (err) reject([err, 2]);
-            
+        connection.query(sqlRequestDetailsMenuPizz(), (err, results) => {
+            if (err) reject([err, "Error from menuPizzas"]);        
             resolve(results); 
         });
     });
 };
 
-module.exports = { detailPizzaMenu }
+module.exports = { getPizzaMenu };
