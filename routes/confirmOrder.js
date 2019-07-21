@@ -86,10 +86,9 @@ router.post("/", (req, res) => {
     if (err) {
       throw err
     }
-    
     // POST orders TABLE
     connection.query(`INSERT INTO orders (dateOrder, orderMessage, orderPrice, userMessage, idUsers, deliveryAddress, facturationAddress) VALUES ` + 
-      `('${orderDate}', 'Merci d avoir commandé chez Ohmyfood', ${orderPrice}, '${userDetail.comment}', ${userDetail.idUsers}, ` + 
+      `('${orderDate}', '${userDetail.deliveryOrTakeAway}', ${orderPrice}, '${userDetail.comment}', ${userDetail.idUsers}, ` + 
       `'${userDetail.livrAddress1} ${userDetail.livrAddress2} ${userDetail.zipcode}', '${userDetail.factAddress}')`, (err, results) => {
           if (err) {
             return connection.rollback(_ => {
