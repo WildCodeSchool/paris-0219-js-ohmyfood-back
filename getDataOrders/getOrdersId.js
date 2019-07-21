@@ -4,7 +4,7 @@ const connection = require("../conf");
 
 const sqlRequestOrdersTable = () => 
     'SELECT users.idUsers, firstname, lastname, mail, phoneNumber, deliveryAddress, userAddressFacturation, ' +
-    'idOrders, dateOrder, orderPrice, userMessage FROM users JOIN orders ON orders.idUsers = users.idUsers ' +
+    'idOrders, dateOrder, orderPrice, userMessage, orderMessage FROM users JOIN orders ON orders.idUsers = users.idUsers ' +
     `JOIN userAddress ON userAddress.idUsers = users.idUsers`;
 
 const ordersTableData = () => {
