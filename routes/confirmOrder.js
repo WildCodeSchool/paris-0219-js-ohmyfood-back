@@ -9,6 +9,7 @@ const getBeverages = require("../getDataOrders/getBeverages");
 const getDesserts = require("../getDataOrders/getDesserts");
 const getSaladsComposed = require("../getDataOrders/getSaladsComposed");
 const getMenuSaladsComposed = require("../getDataOrders/getMenuSalads");
+const getOrdersArchivedId = require("../getDataOrders/getOrdersArchivedId");
 
 router.get("/", (req, res) => {
   const detailOrderList = [];
@@ -89,7 +90,7 @@ router.post("/", (req, res) => {
     // POST orders TABLE
     connection.query(`INSERT INTO orders (dateOrder, orderMessage, orderPrice, userMessage, idUsers, deliveryAddress, facturationAddress) VALUES ` + 
       `('${orderDate}', '${userDetail.deliveryOrTakeAway}', ${orderPrice}, '${userDetail.comment}', ${userDetail.idUsers}, ` + 
-      `'${userDetail.livrAddress1} ${userDetail.livrAddress2} ${userDetail.zipcode}', '${userDetail.factAddress}')`, (err, results) => {
+      `'${userDetail.livrAddress1}, ${userDetail.livrAddress2}, ${userDetail.city} : ${userDetail.zipcode}', '${userDetail.factAddress}')`, (err, results) => {
           if (err) {
             return connection.rollback(_ => {
               res.status(500).send("error from orders");
@@ -356,6 +357,171 @@ router.post("/", (req, res) => {
     res.status(200).json({ results: "send" });
   });
 });
+
+router.put("/", (req, res) => {
+  idOrder = req.body.idOrder;
+
+  connection.query(`UPDATE orders SET archive = 1 WHERE idOrders = ${idOrder}`, err => {
+    if (err) {
+      res.status(500).send("Erreur lors de la mise à jour de la table orders pour archiver les commandes")
+    } else {
+      res.sendStatus(200);
+    }
+  })
+});
+
+router.get("/archive", (req, res) => {
+  const detailOrderArchiveList = [];
+  
+  // Starting getting informations
+  // First from ordersTable
+  getOrdersArchivedId.ordersTableDataArchived()
+  .then(ordersArchivedInfo => {
+    detailOrderArchiveList.push(ordersArchivedInfo); // Push results in final response which is an array
+    
+    // Get userAddress informations
+    getUserAddress.userAddressTableData()
+    .then(userAddressInfos => {
+      detailOrderArchiveList.push(userAddressInfos) // Push results in final response
+      
+      // Get Pizzas details
+      getPizzas.getPizzasDetails()
+      .then(pizzasDetails => {
+        detailOrderArchiveList.push(pizzasDetails); // Push results in final response
+    
+        // Get Beverages details
+        getBeverages.getBeveragesDetails()
+        .then(beveragesDetails => {
+          detailOrderArchiveList.push(beveragesDetails) // Push results in final response
+
+          // Get Desserts details
+          getDesserts.getDessertsDetails()
+          .then(dessertsDetails => {
+            detailOrderArchiveList.push(dessertsDetails); // Push results in final response
+
+            // Get MenuPizz detail
+            getMenuPizz.getPizzaMenu()
+            .then(detailMenuPizz => {
+              detailOrderArchiveList.push(detailMenuPizz); // Push results in final response
+    
+              // Get saladsComposed detail
+              getSaladsComposed.getSaladsComposedDetails()
+              .then(saladsComposedDetails => {
+                detailOrderArchiveList.push(saladsComposedDetails) // Push results in final response
+
+                // Get menuSaladsComposed
+                getMenuSaladsComposed.getSaladsComposedMenu()
+                .then(menuSaladsComposedDetails => {
+                  detailOrderArchiveList.push(menuSaladsComposedDetails) // Push results in final response
+
+                  // Send final response to front
+                  res.json(detailOrderArchiveList) 
+                });
+              });
+            });
+          });
+        });
+      });
+    });
+  });
+})
+
+router.delete("/", (req, res) => {
+  const orderDelete = req.query.orderId;
+
+  connection.query(`DELETE FROM orders WHERE idOrders = ?`, orderDelete, (err, results) => {
+    if (err) {
+      res.status(500).send("Erreur lors de la suppression de la commande, table orders");
+
+    } else {
+      connection.query(`DELETE FROM pizzasOrders WHERE idOrders = ?`, orderDelete, (err, results) => {
+        if (err) {
+          res.status(500).send("Erreur lors de la suppression de la commande, table pizzasOrders");
+          
+        } else {
+          connection.query(`DELETE FROM beveragesOrders WHERE idOrders = ?`, orderDelete, (err, results) => {
+            if (err) {
+              res.status(500).send("Erreur lors de la suppression de la commande, table beveragesOrders");
+
+            } else {
+              connection.query(`DELETE FROM dessertsOrders WHERE idOrders = ?`, orderDelete, (err, results) => {
+                if (err) {
+                  res.status(500).send("Erreur lors de la suppression de la commande, table dessertsOrders");
+    
+                } else {
+                  connection.query(`DELETE FROM beveragesOrders WHERE idOrders = ?`, orderDelete, (err, results) => {
+                    if (err) {
+                      res.status(500).send("Erreur lors de la suppression de la commande, table beveragesOrders");
+
+                    } else {
+                      connection.query(`DELETE FROM menu WHERE idOrders = ?`, orderDelete, (err, results) => {
+                        if (err) {
+                          res.status(500).send("Erreur lors de la suppression de la commande, table menu");
+            
+                        } else {
+                          // Get idSaladsComposed to delete in multiBases, multiIngredients and multiToppings tables
+                          connection.query(`SELECT idSaladsComposed FROM saladsComposed WHERE idOrders = ${orderDelete}`, (err, results) => {
+                            if (err) {
+                              res.status(500).send("Erreur lors de la récupération de l'Id de la salade composée, pour supprimer les tables multiBases, multiIngredients et multiToppings")
+
+                            } else {
+                              // If there is a salads composed in orders
+                              if (results.length > 0 ) {
+                                const idSaladsComposed = results[0].idSaladsComposed;
+
+                                connection.query(`DELETE FROM saladsComposed WHERE idOrders = ?`, orderDelete, (err, results) => {
+                                  if (err) {
+                                    res.status(500).send("Erreur lors de la suppression de la commande, table saladsComposed");
+                        
+                                  } else {    
+                                      connection.query(`DELETE FROM multiBases WHERE idSaladsComposed = ?`, idSaladsComposed, (err, results) => {
+                                        if (err) {
+                                          res.status(500).send("Erreur lors de la suppression de la commande, table multiBases");
+                                
+                                        } else {
+                                            connection.query(`DELETE FROM multiIngredients WHERE idSaladsComposed = ?`, idSaladsComposed, (err, results) => {
+                                              if (err) {
+
+                                                res.status(500).send("Erreur lors de la suppression de la commande, table multiIngredients");
+                                              } else {
+                                                connection.query(`DELETE FROM multiToppings WHERE idSaladsComposed = ?`, idSaladsComposed, (err, results) => {
+                                                  if (err) {
+                                                    res.status(500).send("Erreur lors de la suppression de la commande, table multiToppings");
+                                                    
+                                                    } else {
+                                                        res.sendStatus(200);
+                                                      };
+                                                    });
+                                                  };
+                                                });
+                                              };
+                                            });
+                                          };
+                                      });
+                                  // If there isn't saladsComposed in order
+                                } else {
+                                    res.sendStatus(200);
+                                };
+                              };                           
+                            });
+                          };
+                       });
+                      };
+                    });
+                  };
+              });
+            };
+          });
+        };
+      });
+    };
+  }); 
+});
+
+          
+        
+      
+  
 
 
 module.exports = router;
