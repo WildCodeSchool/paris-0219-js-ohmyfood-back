@@ -26,41 +26,42 @@ router.post("/", (req, res) => {
 
   connection.query(`SELECT password FROM users WHERE mail = '${userMail}'`, (err, results) => {
     if (results.length === 0) {
-      res.status(401).send("Vous n'avez pas de compte");
-    }
-
-    if (err) {
-      res.send('error ' + err);
-
+      res.sendStatus(401);
     } else {
 
-      // User bcrypt to compare input password and password in database OR check password if it's not crypt
-      if (bcrypt.compareSync(userPssw, results[0].password) || userPssw === results[0].password) {
-        connection.query(`SELECT firstname, lastname, mail, password, userRight FROM users WHERE mail = '${userMail}' AND password = '${results[0].password}'`, (err, results) => {
-          if(err) {
-            res.send('error ', err);
-          } else {
-            console.log("user recognized");
-            payload = {
-              "mail": userMail,
-              "password": results['0'].password,
+      if (err) {
+        res.send('error ' + err);
+
+      } else {
+
+        // User bcrypt to compare input password and password in database OR check password if it's not crypt
+        if (bcrypt.compareSync(userPssw, results[0].password) || userPssw === results[0].password) {
+          connection.query(`SELECT firstname, lastname, mail, password, userRight FROM users WHERE mail = '${userMail}' AND password = '${results[0].password}'`, (err, results) => {
+            if(err) {
+              res.send('error ', err);
+            } else {
+              console.log("user recognized");
+              payload = {
+                "mail": userMail,
+                "password": results['0'].password,
+              }
+              const token = jwt.sign(payload, jwtSecret, (err, token) => {
+                  res.json({
+                    token,
+                    'userMail': results['0'].mail,
+                    'userFirstName': results['0'].firstname,
+                    'userLastName': results['0'].lastname,
+                    'userRight': results['0'].userRight,
+                    'userId': results['0'].idUsers
+                  });
+              });
+              res.header("Access-Control-Expose-Headers", "x-access-token");
+              res.set("x-access-token", token);
+              res.status(200);
             }
-            const token = jwt.sign(payload, jwtSecret, (err, token) => {
-                res.json({
-                  token,
-                  'userMail': results['0'].mail,
-                  'userFirstName': results['0'].firstname,
-                  'userLastName': results['0'].lastname,
-                  'userRight': results['0'].userRight,
-                  'userId': results['0'].idUsers
-                });
-            });
-            res.header("Access-Control-Expose-Headers", "x-access-token");
-            res.set("x-access-token", token);
-            res.status(200);
-          }
-        });
-      }  
+          });
+        }  
+      }
     }
   });
 });
