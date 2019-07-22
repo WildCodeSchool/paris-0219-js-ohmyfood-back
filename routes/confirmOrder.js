@@ -9,6 +9,7 @@ const getBeverages = require("../getDataOrders/getBeverages");
 const getDesserts = require("../getDataOrders/getDesserts");
 const getSaladsComposed = require("../getDataOrders/getSaladsComposed");
 const getMenuSaladsComposed = require("../getDataOrders/getMenuSalads");
+const getOrdersArchivedId = require("../getDataOrders/getOrdersArchivedId");
 
 router.get("/", (req, res) => {
   const detailOrderList = [];
@@ -368,6 +369,62 @@ router.put("/", (req, res) => {
     }
   })
 });
+
+router.get("/archive", (req, res) => {
+  const detailOrderArchiveList = [];
+  
+  // Starting getting informations
+  // First from ordersTable
+  getOrdersArchivedId.ordersTableDataArchived()
+  .then(ordersArchivedInfo => {
+    detailOrderArchiveList.push(ordersArchivedInfo); // Push results in final response which is an array
+    
+    // Get userAddress informations
+    getUserAddress.userAddressTableData()
+    .then(userAddressInfos => {
+      detailOrderArchiveList.push(userAddressInfos) // Push results in final response
+      
+      // Get Pizzas details
+      getPizzas.getPizzasDetails()
+      .then(pizzasDetails => {
+        detailOrderArchiveList.push(pizzasDetails); // Push results in final response
+    
+        // Get Beverages details
+        getBeverages.getBeveragesDetails()
+        .then(beveragesDetails => {
+          detailOrderArchiveList.push(beveragesDetails) // Push results in final response
+
+          // Get Desserts details
+          getDesserts.getDessertsDetails()
+          .then(dessertsDetails => {
+            detailOrderArchiveList.push(dessertsDetails); // Push results in final response
+
+            // Get MenuPizz detail
+            getMenuPizz.getPizzaMenu()
+            .then(detailMenuPizz => {
+              detailOrderArchiveList.push(detailMenuPizz); // Push results in final response
+    
+              // Get saladsComposed detail
+              getSaladsComposed.getSaladsComposedDetails()
+              .then(saladsComposedDetails => {
+                detailOrderArchiveList.push(saladsComposedDetails) // Push results in final response
+
+                // Get menuSaladsComposed
+                getMenuSaladsComposed.getSaladsComposedMenu()
+                .then(menuSaladsComposedDetails => {
+                  detailOrderArchiveList.push(menuSaladsComposedDetails) // Push results in final response
+
+                  // Send final response to front
+                  res.json(detailOrderArchiveList) 
+                });
+              });
+            });
+          });
+        });
+      });
+    });
+  });
+})
 
 
 module.exports = router;
