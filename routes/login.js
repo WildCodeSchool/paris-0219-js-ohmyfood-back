@@ -79,7 +79,7 @@ router.post("/protected", (req, res, next) => {
       return res.status(401).send({mess: "Vous n'avez pas accès aux données"});
     }
     console.log('decode',decoded);
-    return res.status(200).send({mess: 'User Datas', objectTests });
+    return res.status(200).send({token: token});
   })
 });
 
