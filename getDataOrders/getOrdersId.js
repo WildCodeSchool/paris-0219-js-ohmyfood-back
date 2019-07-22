@@ -5,7 +5,8 @@ const connection = require("../conf");
 const sqlRequestOrdersTable = () => 
     'SELECT users.idUsers, firstname, lastname, mail, phoneNumber, deliveryAddress, userAddressFacturation, ' +
     'idOrders, dateOrder, orderPrice, userMessage, orderMessage FROM users JOIN orders ON orders.idUsers = users.idUsers ' +
-    `JOIN userAddress ON userAddress.idUsers = users.idUsers`;
+    `JOIN userAddress ON userAddress.idUsers = users.idUsers ` +
+    `WHERE archive IS NULL`;
 
 const ordersTableData = () => {
     return new Promise((resolve, reject) => {
