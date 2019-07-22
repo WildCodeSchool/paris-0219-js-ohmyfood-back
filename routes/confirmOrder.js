@@ -357,5 +357,17 @@ router.post("/", (req, res) => {
   });
 });
 
+router.put("/", (req, res) => {
+  idOrder = req.body.idOrder;
+
+  connection.query(`UPDATE orders SET archive = 1 WHERE idOrders = ${idOrder}`, err => {
+    if (err) {
+      res.status(500).send("Erreur lors de la mise à jour de la table orders pour archiver les commandes")
+    } else {
+      res.sendStatus(200);
+    }
+  })
+});
+
 
 module.exports = router;
