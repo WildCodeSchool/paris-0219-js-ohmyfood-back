@@ -90,7 +90,7 @@ router.post("/", (req, res) => {
     // POST orders TABLE
     connection.query(`INSERT INTO orders (dateOrder, orderMessage, orderPrice, userMessage, idUsers, deliveryAddress, facturationAddress) VALUES ` + 
       `('${orderDate}', '${userDetail.deliveryOrTakeAway}', ${orderPrice}, '${userDetail.comment}', ${userDetail.idUsers}, ` + 
-      `'${userDetail.livrAddress1} ${userDetail.livrAddress2} ${userDetail.zipcode}', '${userDetail.factAddress}')`, (err, results) => {
+      `'${userDetail.livrAddress1}, ${userDetail.livrAddress2}, ${userDetail.city} : ${userDetail.zipcode}', '${userDetail.factAddress}')`, (err, results) => {
           if (err) {
             return connection.rollback(_ => {
               res.status(500).send("error from orders");
@@ -425,6 +425,103 @@ router.get("/archive", (req, res) => {
     });
   });
 })
+
+router.delete("/", (req, res) => {
+  const orderDelete = req.query.orderId;
+
+  connection.query(`DELETE FROM orders WHERE idOrders = ?`, orderDelete, (err, results) => {
+    if (err) {
+      res.status(500).send("Erreur lors de la suppression de la commande, table orders");
+
+    } else {
+      connection.query(`DELETE FROM pizzasOrders WHERE idOrders = ?`, orderDelete, (err, results) => {
+        if (err) {
+          res.status(500).send("Erreur lors de la suppression de la commande, table pizzasOrders");
+          
+        } else {
+          connection.query(`DELETE FROM beveragesOrders WHERE idOrders = ?`, orderDelete, (err, results) => {
+            if (err) {
+              res.status(500).send("Erreur lors de la suppression de la commande, table beveragesOrders");
+
+            } else {
+              connection.query(`DELETE FROM dessertsOrders WHERE idOrders = ?`, orderDelete, (err, results) => {
+                if (err) {
+                  res.status(500).send("Erreur lors de la suppression de la commande, table dessertsOrders");
+    
+                } else {
+                  connection.query(`DELETE FROM beveragesOrders WHERE idOrders = ?`, orderDelete, (err, results) => {
+                    if (err) {
+                      res.status(500).send("Erreur lors de la suppression de la commande, table beveragesOrders");
+
+                    } else {
+                      connection.query(`DELETE FROM menu WHERE idOrders = ?`, orderDelete, (err, results) => {
+                        if (err) {
+                          res.status(500).send("Erreur lors de la suppression de la commande, table menu");
+            
+                        } else {
+                          // Get idSaladsComposed to delete in multiBases, multiIngredients and multiToppings tables
+                          connection.query(`SELECT idSaladsComposed FROM saladsComposed WHERE idOrders = ${orderDelete}`, (err, results) => {
+                            if (err) {
+                              res.status(500).send("Erreur lors de la récupération de l'Id de la salade composée, pour supprimer les tables multiBases, multiIngredients et multiToppings")
+
+                            } else {
+                              // If there is a salads composed in orders
+                              if (results.length > 0 ) {
+                                const idSaladsComposed = results[0].idSaladsComposed;
+
+                                connection.query(`DELETE FROM saladsComposed WHERE idOrders = ?`, orderDelete, (err, results) => {
+                                  if (err) {
+                                    res.status(500).send("Erreur lors de la suppression de la commande, table saladsComposed");
+                        
+                                  } else {    
+                                      connection.query(`DELETE FROM multiBases WHERE idSaladsComposed = ?`, idSaladsComposed, (err, results) => {
+                                        if (err) {
+                                          res.status(500).send("Erreur lors de la suppression de la commande, table multiBases");
+                                
+                                        } else {
+                                            connection.query(`DELETE FROM multiIngredients WHERE idSaladsComposed = ?`, idSaladsComposed, (err, results) => {
+                                              if (err) {
+
+                                                res.status(500).send("Erreur lors de la suppression de la commande, table multiIngredients");
+                                              } else {
+                                                connection.query(`DELETE FROM multiToppings WHERE idSaladsComposed = ?`, idSaladsComposed, (err, results) => {
+                                                  if (err) {
+                                                    res.status(500).send("Erreur lors de la suppression de la commande, table multiToppings");
+                                                    
+                                                    } else {
+                                                        res.sendStatus(200);
+                                                      };
+                                                    });
+                                                  };
+                                                });
+                                              };
+                                            });
+                                          };
+                                      });
+                                  // If there isn't saladsComposed in order
+                                } else {
+                                    res.sendStatus(200);
+                                };
+                              };                           
+                            });
+                          };
+                       });
+                      };
+                    });
+                  };
+              });
+            };
+          });
+        };
+      });
+    };
+  }); 
+});
+
+          
+        
+      
+  
 
 
 module.exports = router;
