@@ -41,7 +41,8 @@ router.post("/", (req, res) => {
       console.log(err);
       res.status(500).send("Erreur lors de la vérification de l'email");
     } else if (results.length > 0) {
-      console.log("L'email existe déjà")
+      console.log("L'email existe déjà");
+      res.json({response: "Cet email existe déjà"});
       res.status(409, 'L\'email existe déja dans la base de donnée')
     } 
     else {
@@ -95,7 +96,7 @@ router.post("/", (req, res) => {
   });
 });
 
-router.post("/account", (req, res, next) => {
+router.post("/account", (req, res) => {
   const userMail = req.body['0'];
   let userId = '';
   let mergeUserAndAdress = '';
@@ -178,15 +179,28 @@ router.put('/account/userAddress', (req, res) => {
   });
 });
 
-router.delete("/", (req, res) => {
-  const mailUser = req.body.mail;
-
-  connection.query('DELETE FROM users WHERE mail = ?', [mailUser], (err, results) => {
+router.delete("/account", (req, res) => {
+  const userMail = req.query.mail;
+  
+  connection.query(`SELECT idUsers FROM users WHERE mail = '${userMail}'`, (err, results) => {
     if (err) {
-      res.status(500).send("Erreur lors de la suppression de l'utilisateur");
+      res.status(500).send("L'utilisateur est introuvable")
     } else {
-      res.sendStatus(200);
-    };
+      idUser = results[0].idUsers
+      connection.query(`DELETE FROM userAddress WHERE idUsers = ${idUser}`, err => {
+        if (err) {
+          res.status(500).send("Erreur lors de la suppression des adresses utilisateurs");
+        } else {
+          connection.query(`DELETE FROM users WHERE mail = '${userMail}'`, err => {
+            if (err) {
+              res.status(500).send("Erreur lors de la suppression de l'utilisateur")
+            } else {
+              res.sendStatus(200)
+            }
+          }) 
+        };
+      });
+    }
   });
 });
 
