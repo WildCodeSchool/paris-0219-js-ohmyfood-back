@@ -13,8 +13,8 @@ let transporter = nodemailer.createTransport({
   service:'gmail',
   secure: false,
   auth: {
-      user: "*******",
-      pass: "*******"
+      user: "*****",
+      pass: "*****"
   }, 
   debug: false,
   logger: true
@@ -26,41 +26,42 @@ router.post("/", (req, res) => {
 
   connection.query(`SELECT password FROM users WHERE mail = '${userMail}'`, (err, results) => {
     if (results.length === 0) {
-      res.status(401).send("Vous n'avez pas de compte");
-    }
-
-    if (err) {
-      res.send('error ' + err);
-
+      res.sendStatus(401);
     } else {
 
-      // User bcrypt to compare input password and password in database OR check password if it's not crypt
-      if (bcrypt.compareSync(userPssw, results[0].password) || userPssw === results[0].password) {
-        connection.query(`SELECT firstname, lastname, mail, password, userRight FROM users WHERE mail = '${userMail}' AND password = '${results[0].password}'`, (err, results) => {
-          if(err) {
-            res.send('error ', err);
-          } else {
-            console.log("user recognized");
-            payload = {
-              "mail": userMail,
-              "password": results['0'].password,
+      if (err) {
+        res.send('error ' + err);
+
+      } else {
+
+        // User bcrypt to compare input password and password in database OR check password if it's not crypt
+        if (bcrypt.compareSync(userPssw, results[0].password) || userPssw === results[0].password) {
+          connection.query(`SELECT firstname, lastname, mail, password, userRight FROM users WHERE mail = '${userMail}' AND password = '${results[0].password}'`, (err, results) => {
+            if(err) {
+              res.send('error ', err);
+            } else {
+              console.log("user recognized");
+              payload = {
+                "mail": userMail,
+                "password": results['0'].password,
+              }
+              const token = jwt.sign(payload, jwtSecret, (err, token) => {
+                  res.json({
+                    token,
+                    'userMail': results['0'].mail,
+                    'userFirstName': results['0'].firstname,
+                    'userLastName': results['0'].lastname,
+                    'userRight': results['0'].userRight,
+                    'userId': results['0'].idUsers
+                  });
+              });
+              res.header("Access-Control-Expose-Headers", "x-access-token");
+              res.set("x-access-token", token);
+              res.status(200);
             }
-            const token = jwt.sign(payload, jwtSecret, (err, token) => {
-                res.json({
-                  token,
-                  'userMail': results['0'].mail,
-                  'userFirstName': results['0'].firstname,
-                  'userLastName': results['0'].lastname,
-                  'userRight': results['0'].userRight,
-                  'userId': results['0'].idUsers
-                });
-            });
-            res.header("Access-Control-Expose-Headers", "x-access-token");
-            res.set("x-access-token", token);
-            res.status(200);
-          }
-        });
-      }  
+          });
+        }  
+      }
     }
   });
 });
@@ -78,7 +79,7 @@ router.post("/protected", (req, res, next) => {
       return res.status(401).send({mess: "Vous n'avez pas accès aux données"});
     }
     console.log('decode',decoded);
-    return res.status(200).send({mess: 'User Datas', objectTests });
+    return res.status(200).send({token: token});
   })
 });
 
@@ -100,9 +101,10 @@ router.post("/forgottenPassword", (req, res) => {
         `, // plaintext body
       }, (error, response) => {
           if(error){
-              console.log(error);
+            console.log(error);
           }else{
-              console.log("Message sent: " + response.message);
+            console.log("Message sent: " + response.message);
+            res.json({'responseNewPssw':'firstStep'})
           }
       });
     }
@@ -111,7 +113,6 @@ router.post("/forgottenPassword", (req, res) => {
 
 router.post("/TzApeyaNpBzRJmGrit59K4NJ5Cy", (req, res) => {
   const userToken = req.body.token
-  console.log('userToken', userToken)
   connection.query(`SELECT forgotPassword FROM users WHERE forgotPassword = '${userToken}'`, (err, results) => {
     if (err) {
       res.status(500).send("Le token ne correspond pas")
@@ -119,7 +120,7 @@ router.post("/TzApeyaNpBzRJmGrit59K4NJ5Cy", (req, res) => {
       res.json({token: `${results}`})
       res.status(200)
     } else { 
-      res.json({token: `${userToken}`})
+      res.json({token: `${userToken}`,response: 'firstStep'});
       res.status(200)
     }
   });
@@ -143,22 +144,19 @@ router.put("/Lm18yduHpcacijU0y2Mi", (req, res) => {
             "mail": decoded.mail,
             "password": password,
           }
-          const token = jwt.sign(payload, jwtSecret, (err, token) => {
-            connection.query(`UPDATE users SET password = '${password}', forgotPassword = '${token}' WHERE forgotPassword = '${forgotPassword}'`, (err, results) => {
-              if (err) {
-                console.log(results)
-                res.status(500).send("L'insertion du mot de passe a échouée")
-              } else {
-                console.log(results)
-                res.json({'response': 'done'})
-                res.status(200)
-              }
+            jwt.sign(payload, jwtSecret, (err, token) => {
+              connection.query(`UPDATE users SET password = '${password}', forgotPassword = '${token}' WHERE forgotPassword = '${forgotPassword}'`, (err, results) => {
+                if (err) {
+                  res.status(500).send("L'insertion du mot de passe a échouée")
+                } else {
+                  res.json({res: 'res'})
+                  res.status(200)
+                }
             });
           });
-          
-        })
+        });
       }
-  });
+    });
   });
 });
 
