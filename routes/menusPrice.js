@@ -12,7 +12,7 @@ router.get("/", (req, res) => {
   });
 });
 
-router.put('/', (req, res) => {
+/* router.put('/', (req, res) => {
   let menuName = '';
 
   if(req.body.idTaxName.indexOf('|') != -1) {
@@ -30,6 +30,6 @@ router.put('/', (req, res) => {
       res.sendStatus(200);
     };
   });
-});
+}); */
 
 module.exports = router;
