@@ -122,16 +122,30 @@ router.post("/account", (req, res, next) => {
 })
 
 
-router.put('/', (req, res) => {
-  const firstNameUser = req.body.firstname;
-  const lastNameUser = req.body.lastname;
-  const userUpdate = req.body;
+router.put('/account', (req, res) => {
+  const userMail = req.body[0].mail
+  const userUpdate = req.body[0];
+  const userAddressUpdate = req.body[1];
 
-  connection.query('UPDATE users SET ? WHERE firstname = ? AND lastname = ?', [userUpdate, firstNameUser, lastNameUser], err => {
+  connection.query(`UPDATE users SET ? WHERE mail = '${userMail}'`, userUpdate, err => {
     if (err) {
       res.status(500).send("Erreur lors de la mise à jour de l'utilisateur");
     } else {
-      res.sendStatus(200);
+      connection.query(`SELECT idUsers FROM users WHERE mail='${userMail}'`, (err, results) => {
+        if (err) {
+          res.status(500).send("Erreur lors de la mise à jour des adresses utilisateur");
+        } else {
+          idUser = results[0].idUsers;
+          connection.query(`UPDATE userAddress SET ? WHERE idUserAddress = ${idUser}'`, userAddressUpdate, err => {
+            if (err) {
+              res.status(500).send("Erreur lors de la mise à jour des adresses utilisateur");
+            } else {
+              res.json({response:'response'});
+              res.sendStatus(200);
+            }
+          });
+        }
+      });
     };
   });
 });
@@ -141,7 +155,7 @@ router.delete("/", (req, res) => {
 
   connection.query('DELETE FROM users WHERE mail = ?', [mailUser], (err, results) => {
     if (err) {
-      res.status(500).send('Erreur lors de la suppression de la pizza');
+      res.status(500).send("Erreur lors de la suppression de l'utilisateur");
     } else {
       res.sendStatus(200);
     };
