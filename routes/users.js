@@ -125,7 +125,30 @@ router.post("/account", (req, res, next) => {
 router.put('/account/user', (req, res) => {
   const userMail = req.body.mail
   const userUpdate = req.body;
-
+  let password = req.body.password;
+  if (password != undefined) {
+    delete req.body.psswVerif;
+    bcrypt.hash(password, 10, (err, hash) => {
+      if (err) {
+        res.send('error ', err)
+      } else {
+        password = hash; // Hash user password
+        payload = {
+          "mail": userMail,
+          "password": password,
+        }
+          jwt.sign(payload, jwtSecret, (err, token) => {
+            connection.query(`UPDATE users SET password = '${password}', forgotPassword = '${token}' WHERE mail = '${userMail}'`, (err, results) => {
+              if (err) {
+                res.status(500).send("L'insertion du mot de passe a échouée")
+              } else {
+                delete req.body.password
+              }
+          });
+        });
+      }
+    });
+  }
   connection.query(`UPDATE users SET ? WHERE mail = '${userMail}'`, userUpdate, err => {
     if (err) {
       res.status(500).send("Erreur lors de la mise à jour de l'utilisateur");
