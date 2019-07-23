@@ -122,31 +122,36 @@ router.post("/account", (req, res, next) => {
 })
 
 
-router.put('/account', (req, res) => {
-  const userMail = req.body[0].mail
-  const userUpdate = req.body[0];
-  const userAddressUpdate = req.body[1];
+router.put('/account/user', (req, res) => {
+  const userMail = req.body.mail
+  const userUpdate = req.body;
 
   connection.query(`UPDATE users SET ? WHERE mail = '${userMail}'`, userUpdate, err => {
     if (err) {
       res.status(500).send("Erreur lors de la mise à jour de l'utilisateur");
+    } else {      
+      res.json({res: 'response'});
+      res.status(200)
+    };
+  });
+});
+
+router.put('/account/userAddress', (req, res) => {
+  const userMail = req.body[1].mail
+  const userAddressUpdate = req.body[0];
+  connection.query(`SELECT idUsers FROM users WHERE mail='${userMail}'`, (err, results) => {
+    if (err) {
+      res.status(500).send("Erreur lors de la mise à jour des adresses utilisateur");
     } else {
-      connection.query(`SELECT idUsers FROM users WHERE mail='${userMail}'`, (err, results) => {
+      idUser = results[0].idUsers;
+      connection.query(`UPDATE userAddress SET ? WHERE idUserAddress = ${idUser}`, userAddressUpdate, err => {
         if (err) {
           res.status(500).send("Erreur lors de la mise à jour des adresses utilisateur");
         } else {
-          idUser = results[0].idUsers;
-          connection.query(`UPDATE userAddress SET ? WHERE idUserAddress = ${idUser}'`, userAddressUpdate, err => {
-            if (err) {
-              res.status(500).send("Erreur lors de la mise à jour des adresses utilisateur");
-            } else {
-              res.json({response:'response'});
-              res.sendStatus(200);
-            }
-          });
+          res.sendStatus(200);
         }
       });
-    };
+    }
   });
 });
 
