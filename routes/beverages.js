@@ -49,4 +49,17 @@ router.delete("/", (req, res) => {
 	});
 });
 
+router.get("/menu", (req, res) => {
+	connection.query(`SELECT idBeverages, bevName, CAST((bevPriceHt * taxValue * 100) / 100 AS DECIMAL(16,2)) AS bevPriceTTC ` + 
+	`FROM beverages JOIN tax ON beverages.idTax = tax.idTax WHERE bevPriceHt < 3 AND bevName != 'café' ` +
+	`AND bevName != 'thé' AND bevName != 'Eau Cristalline 1L'`, (err, results) => {
+		if (err) {
+			res.status(500).send("Erreur lors de la récupération des boissons pour le menu");
+			
+		} else {
+			res.json(results);
+		};
+	});
+});
+
 module.exports = router;
