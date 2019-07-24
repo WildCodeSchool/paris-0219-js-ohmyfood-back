@@ -15,7 +15,7 @@ router.get("/", (req, res) => {
 router.put('/', (req, res) => {
   let nameTax = '';
 
-  if(req.body.idTaxName.indexOf('|') != -1) {
+  if (req.body.idTaxName.indexOf('|') != -1) {
     nameTax = req.body.idTaxName.split('|')[0];
     req.body.idTaxName = req.body.idTaxName.split('|')[1];
   } else {
@@ -23,7 +23,7 @@ router.put('/', (req, res) => {
   }
   const taxUpdate = req.body;
 
-  connection.query('UPDATE tax SET ? WHERE idTaxName = ?', [taxUpdate, nameTax], err => {
+  connection.query('UPDATE tax SET ? WHERE idTaxName = ?', [taxUpdate, nameTax], (err, results) => {
     if (err) {
       res.status(500).send("Erreur lors de la modification de la tax");
     } else {

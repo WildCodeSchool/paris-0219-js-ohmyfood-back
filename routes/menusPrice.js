@@ -12,17 +12,4 @@ router.get("/", (req, res) => {
   });
 });
 
-router.put('/', (req, res) => {
-  let menuName = '';
-  
-
-  connection.query(`UPDATE menusPrice SET ${menuName} = ?`, [menuName], err => {
-    if (err) {
-      res.status(500).send("Erreur lors de la modification du prix du menu");
-    } else {
-      res.sendStatus(200);
-    };
-  });
-});
-
 module.exports = router;
