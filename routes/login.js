@@ -26,7 +26,7 @@ router.post("/", (req, res) => {
 
   connection.query(`SELECT password FROM users WHERE mail = '${userMail}'`, (err, results) => {
     if (results.length === 0) {
-      res.sendStatus(401);
+      res.status(401).send(`L'adresse mail entrée est incorrecte.`);
     } else {
 
       if (err) {
@@ -60,6 +60,8 @@ router.post("/", (req, res) => {
               res.status(200);
             }
           });
+        } else {
+          res.status(401).send(`Le mot de passe entré est incorrect`)
         }  
       }
     }
