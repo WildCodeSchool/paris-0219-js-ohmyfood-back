@@ -85,28 +85,33 @@ router.post("/protected", (req, res, next) => {
 
 router.post("/forgottenPassword", (req, res) => {
   const userMail = req.body.userMail;
-
+  
   connection.query(`SELECT mail, forgotPassword FROM users WHERE mail = '${userMail}'`, (err, results) => {
     if (err) {
       console.log(err);
       res.status(500).send("Erreur lors de la vérification de l'email");
     } else {
-      transporter.sendMail({
-        from: "OhMyFood", // Expediteur
-        to: userMail, // Destinataires
-        subject: "Récupération de votre mot de passe", // Sujet
-        text: `Ce mail vous est destiné dans le cas où vous avez fait une demande de nouveau mot de passe. Cliquez sur le lien suivant pour continuer la procédure : 
-        http://localhost:4200/TzApeyaNpBzRJmGrit59K4NJ5Cy/${results[0].forgotPassword}
-          Dans le cas où vous n'avez pas fait cette demande, contactez l'équipe d'OhMyFood pour que ceux-ci puissent résoudre le problème le plus rapidement possible.
-        `, // plaintext body
-      }, (error, response) => {
-          if(error){
-            console.log(error);
-          }else{
-            console.log("Message sent: " + response.message);
-            res.json({'responseNewPssw':'firstStep'})
-          }
-      });
+      if (results.length == 0) {
+        res.json({'responseNewPssw':"Cet email n'existe pas"})
+        res.status(200);
+      } else {
+        transporter.sendMail({
+          from: "OhMyFood", // Expediteur
+          to: userMail, // Destinataires
+          subject: "Récupération de votre mot de passe", // Sujet
+          text: `Ce mail vous est destiné dans le cas où vous avez fait une demande de nouveau mot de passe. Cliquez sur le lien suivant pour continuer la procédure : 
+          http://localhost:4200/TzApeyaNpBzRJmGrit59K4NJ5Cy/${results[0].forgotPassword}
+            Dans le cas où vous n'avez pas fait cette demande, contactez l'équipe d'OhMyFood pour que ceux-ci puissent résoudre le problème le plus rapidement possible.
+          `, // plaintext body
+        }, (error, response) => {
+            if(error){
+              console.log(error);
+            }else{
+              console.log("Message sent: " + response.message);
+              res.json({'responseNewPssw':'firstStep'})
+            }
+        });
+      }
     }
   });
 });

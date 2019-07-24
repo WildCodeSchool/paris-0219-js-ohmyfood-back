@@ -57,4 +57,28 @@ router.delete("/", (req, res) => {
   });
 });
 
+router.get("/ohMyMardi", (req, res) => {
+  connection.query('SELECT CAST((pizzPriceReduc * taxValue * 100) / 100 AS DECIMAL(16,2)) AS pizzPriceReducTTC ' + 
+  'FROM ohMyMardi JOIN tax ON ohMyMardi.idtax = tax.idtax', (err, results) => {
+    if (err) {
+      res.status(500).send("Erreur lors de la récupération du tarif 'ohMyMardi'");
+    } else {
+      res.json(results);
+    };
+  });
+});
+
+// Get for menu because there isn't pizza de la semaine in menu
+router.get("/menu", (req, res) => {
+	connection.query(`SELECT idPizzas, pizzName, CAST((pizzPriceHt * taxValue * 100) / 100 AS DECIMAL(16,2)) AS pizzPriceTTC ` + 
+	`FROM pizzas JOIN tax ON pizzas.idTax = tax.idTax WHERE pizzName != 'Pizza de la semaine'`, (err, results) => {
+		if (err) {
+			res.status(500).send("Erreur lors de la récupération des pizzas pour le menu");
+			
+		} else {
+			res.json(results);
+		};
+	});
+});
+
 module.exports = router;
