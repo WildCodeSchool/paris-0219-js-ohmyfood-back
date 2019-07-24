@@ -50,4 +50,17 @@ router.delete('/', (req, res) => {
   });
 });
 
+// Route for menu because there isn't pizza nutella in menus
+router.get("/menu", (req, res) => {
+	connection.query(`SELECT idDesserts, dessName, CAST((dessPrice_Ht * taxValue * 100) / 100 AS DECIMAL(16,2)) AS dessPriceTTC ` + 
+	`FROM desserts JOIN tax ON desserts.idTax = tax.idTax WHERE dessName != 'Pizza Nutella cuite au four'`, (err, results) => {
+		if (err) {
+			res.status(500).send("Erreur lors de la récupération des desserts pour le menu");
+			
+		} else {
+			res.json(results);
+		};
+	});
+});
+
 module.exports = router;
