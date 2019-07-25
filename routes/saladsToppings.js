@@ -35,7 +35,6 @@ router.put('/', (req, res) => {
     nameTop = req.body.saladsToppingsName;
   }
   const updateSaladTop = req.body;
-  console.log(req.body.saladsToppingsName)
 
   connection.query('UPDATE saladsToppings SET ? WHERE saladsToppingsName = ?', [updateSaladTop, nameTop], (err, results)  => {
     if (err) {

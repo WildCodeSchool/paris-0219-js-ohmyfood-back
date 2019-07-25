@@ -9,6 +9,7 @@ const confirmOrder = require("./confirmOrder");
 const users = require("./users");
 const login = require("./login");
 const menusPrice = require("./menusPrice");
+const tax = require("./tax")
 
 module.exports = { 
     saladsBase, 
@@ -21,6 +22,7 @@ module.exports = {
     confirmOrder, 
     users, 
     login,
-    menusPrice
+    menusPrice,
+    tax
 }
 
