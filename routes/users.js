@@ -150,7 +150,7 @@ router.put('/account/user', (req, res) => {
       }
     });
   }
-  connection.query(`UPDATE users SET ? WHERE mail = '${userMail}'`, userUpdate, err => {
+  connection.query(`UPDATE users SET ? WHERE mail = 1 '${userMail}'`, userUpdate, err => {
     if (err) {
       res.status(500).send("Erreur lors de la mise à jour de l'utilisateur");
     } else {      
