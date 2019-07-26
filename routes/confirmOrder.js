@@ -19,52 +19,44 @@ router.get("/", (req, res) => {
   getOrdersId.ordersTableData()
   .then(ordersInfo => {
     detailOrderList.push(ordersInfo); // Push results in final response which is an array
-    
     // Get userAddress informations
     getUserAddress.userAddressTableData()
     .then(userAddressInfos => {
       detailOrderList.push(userAddressInfos) // Push results in final response
-      
       // Get Pizzas details
       getPizzas.getPizzasDetails()
       .then(pizzasDetails => {
         detailOrderList.push(pizzasDetails); // Push results in final response
-    
         // Get Beverages details
         getBeverages.getBeveragesDetails()
         .then(beveragesDetails => {
           detailOrderList.push(beveragesDetails) // Push results in final response
-
           // Get Desserts details
           getDesserts.getDessertsDetails()
           .then(dessertsDetails => {
             detailOrderList.push(dessertsDetails); // Push results in final response
-
             // Get MenuPizz detail
             getMenuPizz.getPizzaMenu()
             .then(detailMenuPizz => {
               detailOrderList.push(detailMenuPizz); // Push results in final response
-    
               // Get saladsComposed detail
               getSaladsComposed.getSaladsComposedDetails()
               .then(saladsComposedDetails => {
                 detailOrderList.push(saladsComposedDetails) // Push results in final response
-
                 // Get menuSaladsComposed
                 getMenuSaladsComposed.getSaladsComposedMenu()
                 .then(menuSaladsComposedDetails => {
                   detailOrderList.push(menuSaladsComposedDetails) // Push results in final response
-
                   // Send final response to front
                   res.json(detailOrderList) 
-                });
-              });
-            });
-          });
-        });
-      });
-    });
-  });
+                }).catch(err => {console.log(err)});
+              }).catch(err => {console.log(err)});
+            }).catch(err => {console.log(err)});
+          }).catch(err => {console.log(err)});
+        }).catch(err => {console.log(err)});
+      }).catch(err => {console.log(err)});
+    }).catch(err => {console.log(err)});
+  }).catch(err => {console.log(err)});
 });        
       
 
@@ -128,9 +120,9 @@ router.post("/", (req, res) => {
                     });
                   } else {
                       const saladComposedId = results.insertId; // get saladComposedId from post above
-                      // POST multiBases TABLE
+                      // POST multibases TABLE
                       salad.multiBases.map(bases => {
-                        connection.query(`INSERT INTO multiBases (idSaladsBase, idSaladsComposed, multiBasesQuantity) VALUES ` +
+                        connection.query(`INSERT INTO multibases (idSaladsBase, idSaladsComposed, multiBasesQuantity) VALUES ` +
                         `(${bases.idSaladsBase}, ${saladComposedId}, ${bases.multiBasesQuantity})`, (err, results) => {
                             if (err) {
                               return connection.rollback(_ => {
@@ -281,13 +273,13 @@ router.post("/", (req, res) => {
                         });
                       } else {
                           const saladComposedId = results.insertId; // get saladComposedId from post above
-                          // POST multiBases TABLE
+                          // POST multibases TABLE
                           menuSalads.salad.orderSaladsBases.map(bases => {
-                            connection.query(`INSERT INTO multiBases (idSaladsBase, idSaladsComposed, multiBasesQuantity) VALUES ` +
+                            connection.query(`INSERT INTO multibases (idSaladsBase, idSaladsComposed, multibasesQuantity) VALUES ` +
                             `(${bases.idSaladsBases}, ${saladComposedId}, ${bases.saladsBasesQuantity})`, (err, results) => {
                                 if (err) {
                                   return connection.rollback(_ => {
-                                    res.status(500).send("error from multiBases");
+                                    res.status(500).send("error from multibases");
                                     throw err;
                                   });
                                 };
@@ -459,10 +451,10 @@ router.delete("/", (req, res) => {
                           res.status(500).send("Erreur lors de la suppression de la commande, table menu");
             
                         } else {
-                          // Get idSaladsComposed to delete in multiBases, multiIngredients and multiToppings tables
+                          // Get idSaladsComposed to delete in multibases, multiIngredients and multiToppings tables
                           connection.query(`SELECT idSaladsComposed FROM saladsComposed WHERE idOrders = ${orderDelete}`, (err, results) => {
                             if (err) {
-                              res.status(500).send("Erreur lors de la récupération de l'Id de la salade composée, pour supprimer les tables multiBases, multiIngredients et multiToppings")
+                              res.status(500).send("Erreur lors de la récupération de l'Id de la salade composée, pour supprimer les tables multibases, multiIngredients et multiToppings")
 
                             } else {
                               // If there is a salads composed in orders
@@ -474,9 +466,9 @@ router.delete("/", (req, res) => {
                                     res.status(500).send("Erreur lors de la suppression de la commande, table saladsComposed");
                         
                                   } else {    
-                                      connection.query(`DELETE FROM multiBases WHERE idSaladsComposed = ?`, idSaladsComposed, (err, results) => {
+                                      connection.query(`DELETE FROM multibases WHERE idSaladsComposed = ?`, idSaladsComposed, (err, results) => {
                                         if (err) {
-                                          res.status(500).send("Erreur lors de la suppression de la commande, table multiBases");
+                                          res.status(500).send("Erreur lors de la suppression de la commande, table multibases");
                                 
                                         } else {
                                             connection.query(`DELETE FROM multiIngredients WHERE idSaladsComposed = ?`, idSaladsComposed, (err, results) => {
