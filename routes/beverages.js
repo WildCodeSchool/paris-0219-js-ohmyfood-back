@@ -25,10 +25,18 @@ router.post("/", (req, res) => {
 });
 
 router.put("/", (req, res) => {
-	const bevName = req.body.bevName; // Get idBeverages
-	const beveragesUpdate = req.body; // Get all data
+	let nameBeverage = '';
+
+	if (req.body.bevName.indexOf('|') !== -1) {
+		nameBeverage = req.body.bevName.split('|')[0];
+		req.body.bevName = req.body.bevName.split('|')[1];
+
+	} else {
+		nameBeverage = req.body.bevName;
+	}
+	const beveragesUpdate = req.body;
   
-	connection.query('UPDATE beverages SET ? WHERE bevName = ?', [beveragesUpdate, bevName], err => {
+	connection.query('UPDATE beverages SET ? WHERE bevName = ?', [beveragesUpdate, nameBeverage], err => {
 	  if (err) {
 		res.status(500).send('Erreur lors de la modification de la boisson');
 	  	} else {

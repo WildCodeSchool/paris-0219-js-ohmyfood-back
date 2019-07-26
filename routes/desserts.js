@@ -25,17 +25,25 @@ router.post("/", (req, res) => {
   });
 });
 
-router.put('/', (req, res) => {
-  const dessertName = req.body.dessName; // Get idDesserts
-  const dessertsUpdate = req.body; // Get all data
+router.put("/", (req, res) => {
+	let nameDessert = '';
 
-  connection.query('UPDATE desserts SET ? WHERE dessName = ?', [dessertsUpdate, dessertName], err => {
-    if (err) {
-      res.status(500).send("Erreur lors de la modification d'un dessert");
-    } else {
-      res.sendStatus(200);
-    };
-  });
+	if (req.body.dessName.indexOf('|') !== -1) {
+		nameDessert = req.body.dessName.split('|')[0];
+		req.body.dessName = req.body.dessName.split('|')[1];
+
+	} else {
+		nameDessert = req.body.dessName;
+	}
+	const dessertsUpdate = req.body;
+  
+	connection.query('UPDATE desserts SET ? WHERE dessName = ?', [dessertsUpdate, nameDessert], err => {
+	  if (err) {
+		res.status(500).send('Erreur lors de la modification du dessert');
+	  	} else {
+			res.sendStatus(200);
+	  	};
+	});
 });
 
 router.delete('/', (req, res) => {
